@@ -1,20 +1,41 @@
 const admin = require('../config/firebase');
-const { error } = require('../utils/responseHelper');
+const userModel = require('../models/userModel');
 
 const firebaseAuthMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return error(res, 'Unauthorized: missing or invalid token', 401);
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized: No token provided',
+      });
     }
 
     const token = authHeader.split('Bearer ')[1];
     const decodedToken = await admin.auth().verifyIdToken(token);
-    req.user = decodedToken;
+
+    const mysqlUser = await userModel.findOrCreate(
+      decodedToken.uid,
+      decodedToken.name || decodedToken.email,
+      decodedToken.email
+    );
+
+    req.user = mysqlUser;
+
     next();
   } catch (err) {
-    return error(res, 'Unauthorized: invalid token', 401);
+    if (
+      err.code === 'auth/id-token-expired' ||
+      err.code === 'auth/argument-error' ||
+      err.code === 'auth/id-token-revoked'
+    ) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized: Invalid or expired token',
+      });
+    }
+    next(err);
   }
 };
 

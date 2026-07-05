@@ -1,18 +1,11 @@
 const itineraryItemModel = require('../models/itineraryItemModel');
-const userModel = require('../models/userModel');
 const { success, created, error } = require('../utils/responseHelper');
 
 const createItineraryItem = async (req, res, next) => {
   try {
-    const user = await userModel.findByFirebaseUid(req.user.uid);
-
-    if (!user) {
-      return error(res, 'User not found', 404);
-    }
-
     const itinerary = await itineraryItemModel.verifyItineraryOwnership(
       req.params.itineraryId,
-      user.id
+      req.user.id
     );
 
     if (!itinerary) {
@@ -31,7 +24,7 @@ const createItineraryItem = async (req, res, next) => {
       type,
     });
 
-    const item = await itineraryItemModel.findById(itemId, user.id);
+    const item = await itineraryItemModel.findById(itemId, req.user.id);
     return created(res, item, 'Itinerary item created successfully');
   } catch (err) {
     next(err);
@@ -40,13 +33,7 @@ const createItineraryItem = async (req, res, next) => {
 
 const updateItineraryItem = async (req, res, next) => {
   try {
-    const user = await userModel.findByFirebaseUid(req.user.uid);
-
-    if (!user) {
-      return error(res, 'User not found', 404);
-    }
-
-    const existing = await itineraryItemModel.findById(req.params.id, user.id);
+    const existing = await itineraryItemModel.findById(req.params.id, req.user.id);
 
     if (!existing) {
       return error(res, 'Itinerary item not found', 404);
@@ -54,7 +41,7 @@ const updateItineraryItem = async (req, res, next) => {
 
     const { title, description, location, startTime, endTime, type } = req.body;
 
-    await itineraryItemModel.update(req.params.id, user.id, {
+    await itineraryItemModel.update(req.params.id, req.user.id, {
       title: title ?? existing.title,
       description: description ?? existing.description,
       location: location ?? existing.location,
@@ -63,7 +50,7 @@ const updateItineraryItem = async (req, res, next) => {
       type: type ?? existing.type,
     });
 
-    const item = await itineraryItemModel.findById(req.params.id, user.id);
+    const item = await itineraryItemModel.findById(req.params.id, req.user.id);
     return success(res, item, 'Itinerary item updated successfully');
   } catch (err) {
     next(err);
@@ -72,13 +59,7 @@ const updateItineraryItem = async (req, res, next) => {
 
 const deleteItineraryItem = async (req, res, next) => {
   try {
-    const user = await userModel.findByFirebaseUid(req.user.uid);
-
-    if (!user) {
-      return error(res, 'User not found', 404);
-    }
-
-    const affectedRows = await itineraryItemModel.remove(req.params.id, user.id);
+    const affectedRows = await itineraryItemModel.remove(req.params.id, req.user.id);
 
     if (!affectedRows) {
       return error(res, 'Itinerary item not found', 404);

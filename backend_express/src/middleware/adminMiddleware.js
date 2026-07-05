@@ -1,19 +1,11 @@
-const userModel = require('../models/userModel');
-const { error } = require('../utils/responseHelper');
-
-const adminMiddleware = async (req, res, next) => {
-  try {
-    const user = await userModel.findByFirebaseUid(req.user.uid);
-
-    if (!user || user.role !== 'admin') {
-      return error(res, 'Forbidden: admin access required', 403);
-    }
-
-    req.dbUser = user;
-    next();
-  } catch (err) {
-    next(err);
+const adminMiddleware = (req, res, next) => {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({
+      success: false,
+      message: 'Forbidden: Admin access required',
+    });
   }
+  next();
 };
 
 module.exports = adminMiddleware;

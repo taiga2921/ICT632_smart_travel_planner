@@ -12,21 +12,28 @@ const findOrCreate = async (firebaseUid, name, email) => {
   let user = await findByFirebaseUid(firebaseUid);
   if (!user) {
     await pool.query(
-      'INSERT INTO users (firebase_uid, name, email) VALUES (?, ?, ?)',
-      [firebaseUid, name, email]
+      'INSERT INTO users (firebase_uid, name, email, role) VALUES (?, ?, ?, ?)',
+      [firebaseUid, name || email, email, 'user']
     );
     user = await findByFirebaseUid(firebaseUid);
   }
   return user;
 };
 
-const update = async (id, data) => {
-  const { name } = data;
-  const [result] = await pool.query(
+const findById = async (id) => {
+  const [rows] = await pool.query(
+    'SELECT * FROM users WHERE id = ?',
+    [id]
+  );
+  return rows[0] || null;
+};
+
+const updateById = async (id, name) => {
+  await pool.query(
     'UPDATE users SET name = ? WHERE id = ?',
     [name, id]
   );
-  return result.affectedRows;
+  return findById(id);
 };
 
 const findAll = async () => {
@@ -36,4 +43,4 @@ const findAll = async () => {
   return rows;
 };
 
-module.exports = { findByFirebaseUid, findOrCreate, update, findAll };
+module.exports = { findByFirebaseUid, findOrCreate, findById, updateById, findAll };
