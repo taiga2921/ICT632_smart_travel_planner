@@ -21,6 +21,8 @@ Follow this workflow every time you work on the project.
 
 ---
 
+
+
 ## 1. First Time Setup — Clone the Repository
 
 > Do this **once only** when you first join the project.
@@ -38,6 +40,7 @@ git remote -v
 ```
 
 Expected output:
+
 ```
 origin  https://github.com/taiga2921/ICT632_smart_travel_planner.git (fetch)
 origin  https://github.com/taiga2921/ICT632_smart_travel_planner.git (push)
@@ -45,9 +48,12 @@ origin  https://github.com/taiga2921/ICT632_smart_travel_planner.git (push)
 
 ---
 
+
+
 ## 2. Understand the Branch Structure
 
 example:
+
 ```
 main
  └── develop
@@ -58,6 +64,7 @@ main
 ```
 
 or if you want specific feature/work:
+
 ```
 main
  └── develop
@@ -72,16 +79,20 @@ main
       └── fix/bug-name                (Any member)
 ```
 
-| Branch | Rule |
-|---|---|
-| `main` | Final stable submission only. Nobody pushes directly here. |
-| `develop` | Active integration branch. All feature branches merge here. |
+
+| Branch                    | Rule                                                                                      |
+| ------------------------- | ----------------------------------------------------------------------------------------- |
+| `main`                    | Final stable submission only. Nobody pushes directly here.                                |
+| `develop`                 | Active integration branch. All feature branches merge here.                               |
 | `<your_name>`/`feature/*` | Your working branch. Created from `develop`. Merged back into `develop` via Pull Request. |
+
 
 > **Rule:** You never push directly to `main` or `develop`.
 > You always work on a `feature/` branch and open a Pull Request.
 
 ---
+
+
 
 ## 3. Correct Full Workflow — Every Session
 
@@ -107,14 +118,19 @@ START OF SESSION
 ```
 
 > **Key correction from your original plan:**
+>
 > - Create the branch **BEFORE** doing work, not after.
-> - Pull from **`develop`**, not `main`.
+> - Pull from `develop`, not `main`.
 > - Only open a Pull Request when the work is **done and ready to merge**.
 > - GitHub calls it a **Pull Request (PR)**, not a Merge Request.
 
 ---
 
+
+
 ## 4. Step-by-Step Commands Reference
+
+
 
 ### Step 1 — Go to your project folder
 
@@ -124,6 +140,8 @@ cd smart-travel-planner
 
 ---
 
+
+
 ### Step 2 — Switch to develop
 
 ```bash
@@ -131,6 +149,8 @@ git checkout develop
 ```
 
 ---
+
+
 
 ### Step 3 — Pull the latest code from develop
 
@@ -143,19 +163,25 @@ git pull origin develop
 
 ---
 
-### Step 4 — Create your feature branch from develop
+
+
+### Step 4 — Create your branch from develop
 
 > Create the branch first. Work on it second.
-> Name your branch clearly based on what you are building.
+> Name your branch.
 
 ```bash
 # Create a new branch and switch to it at the same time
-git checkout -b feature/your-feature-name
+git checkout -b eni
 ```
 
 Examples:
 
 ```bash
+git checkout -b eni
+git checkout -b aten
+git checkout -b kwan
+git checkout -b mancap
 git checkout -b feature/flutter-ui
 git checkout -b feature/trip-planner-ui
 git checkout -b feature/express-api
@@ -174,13 +200,17 @@ git branch
 ```
 
 The branch with `*` is your current branch:
+
 ```
   develop
-* feature/flutter-ui
+* eni
+  feature/flutter-ui
   main
 ```
 
 ---
+
+
 
 ### Step 5 — Do your work and commit regularly
 
@@ -219,6 +249,8 @@ test: add Postman collection for trip API
 
 ---
 
+
+
 ### Step 6 — Push your feature branch to GitHub
 
 ```bash
@@ -240,6 +272,8 @@ git push
 
 ---
 
+
+
 ### Step 7 — Check your branch and commit history
 
 ```bash
@@ -258,6 +292,8 @@ git status
 
 ---
 
+
+
 ## 5. Opening a Pull Request on GitHub
 
 > Only open a Pull Request when your feature is **done and working**.
@@ -267,13 +303,17 @@ git status
 
 1. Go to your repository on GitHub.
 2. Click the **"Compare & pull request"** button that appears after you push a branch.
-   Or go to **Pull Requests tab** → **New Pull Request**.
+  Or go to **Pull Requests tab** → **New Pull Request**.
 3. Set the branches:
-   - **base:** `develop`
-   - **compare:** `feature/your-feature-name`
+  - **base:** `develop`
+  - **compare:** `feature/your-feature-name`
 4. Write a clear title and description:
 
 ```
+Nak tinggal kosong pon boleh, kalau rajin boleh buat
+
+Example:
+
 Title: feat: add trip list screen and create trip screen
 
 Description:
@@ -281,17 +321,17 @@ Description:
 - Added create trip form with destination, dates, budget fields
 - Added navigation between trip screens
 - Connected to Express API /api/trips endpoint
-
-Related to: Member 1 responsibilities
 ```
 
-5. Assign a reviewer (another team member).
-6. Click **"Create Pull Request"**.
-7. Wait for the reviewer to approve.
-8. After approval, click **"Merge Pull Request"**.
-9. Click **"Delete Branch"** to clean up the merged branch.
+1. Assign a reviewer (another team member).
+2. Click **"Create Pull Request"**.
+3. Wait for the reviewer to approve.
+4. After approval, click **"Merge Pull Request"**.
+5. Click **"Delete Branch"** to clean up the merged branch.
 
 ---
+
+
 
 ## 6. After Pull Request is Merged
 
@@ -311,6 +351,8 @@ If you are continuing work on a new feature, start from Step 3 again:
 create a fresh branch from the updated `develop`.
 
 ---
+
+
 
 ## 7. How to Update Your Branch If develop Changed
 
@@ -340,6 +382,8 @@ git rebase origin/develop
 
 ---
 
+
+
 ## 8. Handling Merge Conflicts
 
 A conflict happens when two people changed the same part of the same file.
@@ -351,6 +395,7 @@ git status
 ```
 
 Conflicted files will show:
+
 ```
 both modified: lib/config/app_config.dart
 ```
@@ -385,7 +430,11 @@ git commit -m "fix: resolve merge conflict in app_config"
 
 ---
 
+
+
 ## 9. Common Mistakes to Avoid
+
+
 
 ### ❌ Mistake 1 — Working directly on develop or main
 
@@ -406,6 +455,8 @@ git checkout -b feature/your-feature-name
 
 ---
 
+
+
 ### ❌ Mistake 2 — Creating branch after doing work on develop
 
 ```bash
@@ -420,6 +471,8 @@ git checkout -b feature/your-feature-name
 ```
 
 ---
+
+
 
 ### ❌ Mistake 3 — Forgetting to pull from develop before creating a new branch
 
@@ -439,12 +492,16 @@ git checkout -b feature/new-feature
 
 ---
 
+
+
 ### ❌ Mistake 4 — Opening a Pull Request into main instead of develop
 
 - Always set **base** to `develop`, not `main`.
 - `main` is only touched at the very end for final submission.
 
 ---
+
+
 
 ### ❌ Mistake 5 — Not committing before switching branches
 
@@ -463,6 +520,8 @@ git checkout develop
 
 ---
 
+
+
 ### ❌ Mistake 6 — Pulling from main instead of develop
 
 ```bash
@@ -475,7 +534,11 @@ git pull origin develop
 
 ---
 
+
+
 ## 10. Quick Command Cheat Sheet
+
+
 
 ### Starting a New Working Session
 
@@ -486,6 +549,8 @@ git pull origin develop
 git checkout -b feature/your-feature-name
 ```
 
+
+
 ### During Work — Save Progress
 
 ```bash
@@ -493,6 +558,8 @@ git status
 git add .
 git commit -m "feat: describe what you did"
 ```
+
+
 
 ### Push to GitHub
 
@@ -504,12 +571,16 @@ git push -u origin feature/your-feature-name
 git push
 ```
 
+
+
 ### After Someone Else's PR is Merged
 
 ```bash
 git checkout develop
 git pull origin develop
 ```
+
+
 
 ### Update Your Current Branch with Latest develop
 
@@ -518,11 +589,15 @@ git fetch origin
 git merge origin/develop
 ```
 
+
+
 ### See What Branch You Are On
 
 ```bash
 git branch
 ```
+
+
 
 ### See Recent Commits
 
@@ -530,11 +605,15 @@ git branch
 git log --oneline
 ```
 
+
+
 ### Undo Last Commit (Keep Changes)
 
 ```bash
 git reset --soft HEAD~1
 ```
+
+
 
 ### Discard All Uncommitted Changes (Careful — Cannot Undo)
 
@@ -542,11 +621,15 @@ git reset --soft HEAD~1
 git checkout -- .
 ```
 
+
+
 ### Delete a Local Branch After PR is Merged
 
 ```bash
 git branch -d feature/your-feature-name
 ```
+
+
 
 ### Delete a Remote Branch (If Not Done via GitHub)
 
@@ -556,11 +639,15 @@ git push origin --delete feature/your-feature-name
 
 ---
 
+
+
 ## 11. Complete Example Walkthrough
 
 This is a full example of **Member 1** working on the trip list screen from start to finish.
 
 ---
+
+
 
 ### Day 1 — First time joining the project
 
@@ -574,6 +661,8 @@ git remote -v
 ```
 
 ---
+
+
 
 ### Day 2 — Starting work on the trip list screen
 
@@ -618,6 +707,8 @@ git push -u origin feature/trip-planner-ui
 
 ---
 
+
+
 ### Day 3 — Continue working (teammate merged something into develop)
 
 ```bash
@@ -645,6 +736,8 @@ git push
 
 ---
 
+
+
 ### Day 4 — Feature is done, open Pull Request
 
 ```bash
@@ -671,6 +764,8 @@ Member 1 (or reviewer) clicks **"Merge Pull Request"** then **"Delete Branch"**.
 
 ---
 
+
+
 ### After PR is Merged — All Members Update
 
 Every team member runs this after a PR is merged:
@@ -684,6 +779,8 @@ git pull origin develop
 Now everyone has the latest code including the merged trip planner screens.
 
 ---
+
+
 
 ### Final Submission — Merge develop into main
 
