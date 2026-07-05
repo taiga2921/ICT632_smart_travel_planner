@@ -323,11 +323,9 @@ Description:
 - Connected to Express API /api/trips endpoint
 ```
 
-1. Assign a reviewer (another team member).
-2. Click **"Create Pull Request"**.
-3. Wait for the reviewer to approve.
-4. After approval, click **"Merge Pull Request"**.
-5. Click **"Delete Branch"** to clean up the merged branch.
+5. Click **"Create Pull Request"**.
+6. Click **"Merge Pull Request"**.
+7. Click **"Delete Branch"** to clean up the merged branch.
 
 ---
 
