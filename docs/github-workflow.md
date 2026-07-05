@@ -33,7 +33,7 @@ Follow this workflow every time you work on the project.
 git clone https://github.com/taiga2921/ICT632_smart_travel_planner.git
 
 # Go into the project folder
-cd smart-travel-planner
+cd ICT632_smart-travel-planner
 
 # Check that remote is connected
 git remote -v
@@ -135,7 +135,7 @@ START OF SESSION
 ### Step 1 — Go to your project folder
 
 ```bash
-cd smart-travel-planner
+cd ICT632_smart-travel-planner
 ```
 
 ---
@@ -541,7 +541,7 @@ git pull origin develop
 ### Starting a New Working Session
 
 ```bash
-cd smart-travel-planner
+cd ICT632_smart-travel-planner
 git checkout develop
 git pull origin develop
 git checkout -b feature/your-feature-name
@@ -652,7 +652,7 @@ This is a full example of **Member 1** working on the trip list screen from star
 ```bash
 # Clone the repository once
 git clone https://github.com/taiga2921/ICT632_smart_travel_planner.git
-cd smart-travel-planner
+cd ICT632_smart-travel-planner
 
 # Verify remote
 git remote -v
@@ -666,7 +666,7 @@ git remote -v
 
 ```bash
 # Go to project folder
-cd smart-travel-planner
+cd ICT632_smart-travel-planner
 
 # Switch to develop and pull the latest
 git checkout develop
@@ -711,7 +711,7 @@ git push -u origin feature/trip-planner-ui
 
 ```bash
 # Start session
-cd smart-travel-planner
+cd ICT632_smart-travel-planner
 
 # Switch to your feature branch (already exists)
 git checkout feature/trip-planner-ui
@@ -769,7 +769,7 @@ Member 1 (or reviewer) clicks **"Merge Pull Request"** then **"Delete Branch"**.
 Every team member runs this after a PR is merged:
 
 ```bash
-cd smart-travel-planner
+cd ICT632_smart-travel-planner
 git checkout develop
 git pull origin develop
 ```
