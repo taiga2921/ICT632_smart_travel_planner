@@ -51,6 +51,16 @@ example:
 ```
 main
  └── develop
+      ├── eni
+      ├── aten
+      ├── kwan
+      └── mancap
+```
+
+or if you want specific feature/work:
+```
+main
+ └── develop
       ├── feature/flutter-ui          (Member 1)
       ├── feature/trip-planner-ui     (Member 1)
       ├── feature/express-api         (Member 2)
@@ -66,7 +76,7 @@ main
 |---|---|
 | `main` | Final stable submission only. Nobody pushes directly here. |
 | `develop` | Active integration branch. All feature branches merge here. |
-| `feature/*` | Your working branch. Created from `develop`. Merged back into `develop` via Pull Request. |
+| `<your_name>`/`feature/*` | Your working branch. Created from `develop`. Merged back into `develop` via Pull Request. |
 
 > **Rule:** You never push directly to `main` or `develop`.
 > You always work on a `feature/` branch and open a Pull Request.
