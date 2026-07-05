@@ -1,48 +1,97 @@
-# =========================
-# Environment / Secrets
-# =========================
+# =============================================================================
+# Smart Travel Planner — .gitignore
+# Monorepo: Flutter + Node.js + Express + MySQL + Firebase
+# =============================================================================
+
+
+# =============================================================================
+# ENVIRONMENT / SECRETS — Never commit real credentials
+# =============================================================================
+
 .env
 .env.*
+
+# Keep the example file so teammates know what variables are needed
 !.env.example
 
-# =========================
-# Node.js / Express
-# =========================
+
+# =============================================================================
+# FIREBASE — Critical: never commit these files
+# =============================================================================
+
+# Android Firebase config
+mobile_flutter/android/app/google-services.json
+
+# iOS Firebase config
+mobile_flutter/ios/GoogleService-Info.plist
+
+# Express backend Firebase service account private key
+serviceAccountKey.json
+firebase-adminsdk*.json
+*-firebase-adminsdk-*.json
+service-account.json
+
+# Firebase emulator and cache
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+
+# =============================================================================
+# NODE.JS / EXPRESS — backend_express/
+# =============================================================================
+
+# Dependencies — reinstalled via npm install
 backend_express/node_modules/
-backend_express/.npm/
+
+# Logs
 backend_express/logs/
 backend_express/*.log
+*.log
 
-# Keep package-lock.json
-!backend_express/package-lock.json
+# npm cache
+backend_express/.npm/
+backend_express/.cache/
 
-# =========================
-# Flutter / Dart
-# =========================
+# package-lock.json must be committed — do not ignore it
+
+
+# =============================================================================
+# FLUTTER / DART — mobile_flutter/
+# =============================================================================
+
+# Dart tool cache
 mobile_flutter/.dart_tool/
 mobile_flutter/.packages
+
+# Build output
 mobile_flutter/build/
+
+# Flutter plugin tracking files (auto-generated)
 mobile_flutter/.flutter-plugins
 mobile_flutter/.flutter-plugins-dependencies
-# mobile_flutter/pubspec.lock
 
-# If this is an application project, better to COMMIT pubspec.lock.
-# So use this instead if you want to commit it:
-!mobile_flutter/pubspec.lock
+# pubspec.lock must be committed — do not ignore it
 
-# =========================
-# FVM
-# =========================
+
+# =============================================================================
+# FVM — Flutter Version Management
+# =============================================================================
+
+# The actual Flutter SDK downloaded by FVM (large, not needed in repo)
 mobile_flutter/.fvm/flutter_sdk
 mobile_flutter/.fvm/versions/
 
-# Keep FVM config
+# Keep FVM config so teammates know which Flutter version to use
 !mobile_flutter/.fvmrc
 !mobile_flutter/.fvm/fvm_config.json
 
-# =========================
-# Android
-# =========================
+
+# =============================================================================
+# ANDROID
+# =============================================================================
+
 mobile_flutter/android/.gradle/
 mobile_flutter/android/app/build/
 mobile_flutter/android/local.properties
@@ -50,9 +99,11 @@ mobile_flutter/android/key.properties
 mobile_flutter/android/**/*.keystore
 mobile_flutter/android/**/*.jks
 
-# =========================
+
+# =============================================================================
 # iOS / macOS
-# =========================
+# =============================================================================
+
 mobile_flutter/ios/Pods/
 mobile_flutter/ios/.symlinks/
 mobile_flutter/ios/Flutter/Flutter.framework
@@ -60,23 +111,75 @@ mobile_flutter/ios/Flutter/Flutter.podspec
 mobile_flutter/ios/Flutter/Generated.xcconfig
 mobile_flutter/ios/Flutter/flutter_export_environment.sh
 
-# =========================
-# IDE / OS
-# =========================
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
 
-# =========================
-# Logs / Temporary Files
-# =========================
+# =============================================================================
+# IDE — VS Code
+# =============================================================================
+
+.vscode/
+
+# Allow shared VS Code settings if needed
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+
+
+# =============================================================================
+# IDE — Android Studio / IntelliJ
+# =============================================================================
+
+.idea/
+*.iml
+
+
+# =============================================================================
+# OPERATING SYSTEM
+# =============================================================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.AppleDouble
+
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+
+# =============================================================================
+# BUILD ARTIFACTS
+# =============================================================================
+
+*.apk
+*.aab
+*.ipa
+
+
+# =============================================================================
+# TEMPORARY FILES
+# =============================================================================
+
 *.log
 *.tmp
 *.bak
 *.swp
+*.swo
+tmp/
+temp/
 
-# =========================
-# Postman local data
-# =========================
+
+# =============================================================================
+# POSTMAN
+# =============================================================================
+
+# Ignore environment files that may contain API keys or tokens
 postman/*local*
+postman/*environment*
+
+# Keep the collection file — safe to commit, contains no secrets
+!postman/smart-travel-planner-api.postman_collection.json
