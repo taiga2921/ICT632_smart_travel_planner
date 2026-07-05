@@ -1,0 +1,82 @@
+# =========================
+# Environment / Secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Node.js / Express
+# =========================
+backend_express/node_modules/
+backend_express/.npm/
+backend_express/logs/
+backend_express/*.log
+
+# Keep package-lock.json
+!backend_express/package-lock.json
+
+# =========================
+# Flutter / Dart
+# =========================
+mobile_flutter/.dart_tool/
+mobile_flutter/.packages
+mobile_flutter/build/
+mobile_flutter/.flutter-plugins
+mobile_flutter/.flutter-plugins-dependencies
+# mobile_flutter/pubspec.lock
+
+# If this is an application project, better to COMMIT pubspec.lock.
+# So use this instead if you want to commit it:
+!mobile_flutter/pubspec.lock
+
+# =========================
+# FVM
+# =========================
+mobile_flutter/.fvm/flutter_sdk
+mobile_flutter/.fvm/versions/
+
+# Keep FVM config
+!mobile_flutter/.fvmrc
+!mobile_flutter/.fvm/fvm_config.json
+
+# =========================
+# Android
+# =========================
+mobile_flutter/android/.gradle/
+mobile_flutter/android/app/build/
+mobile_flutter/android/local.properties
+mobile_flutter/android/key.properties
+mobile_flutter/android/**/*.keystore
+mobile_flutter/android/**/*.jks
+
+# =========================
+# iOS / macOS
+# =========================
+mobile_flutter/ios/Pods/
+mobile_flutter/ios/.symlinks/
+mobile_flutter/ios/Flutter/Flutter.framework
+mobile_flutter/ios/Flutter/Flutter.podspec
+mobile_flutter/ios/Flutter/Generated.xcconfig
+mobile_flutter/ios/Flutter/flutter_export_environment.sh
+
+# =========================
+# IDE / OS
+# =========================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# =========================
+# Logs / Temporary Files
+# =========================
+*.log
+*.tmp
+*.bak
+*.swp
+
+# =========================
+# Postman local data
+# =========================
+postman/*local*
