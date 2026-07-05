@@ -251,6 +251,14 @@ Navigate to `backend_express/database/migrations/` and run the SQL files in orde
 005_create_itinerary_items_table.sql
 006_create_expenses_table.sql
 007_create_admin_logs_table.sql
+
+Get-Content database/migrations/001_create_users_table.sql | mysql -u root -p smart_travel_planner
+Get-Content database/migrations/002_create_destinations_table.sql | mysql -u root -p smart_travel_planner
+Get-Content database/migrations/003_create_trips_table.sql | mysql -u root -p smart_travel_planner
+Get-Content database/migrations/004_create_itineraries_table.sql | mysql -u root -p smart_travel_planner
+Get-Content database/migrations/005_create_itinerary_items_table.sql | mysql -u root -p smart_travel_planner
+Get-Content database/migrations/006_create_expenses_table.sql | mysql -u root -p smart_travel_planner
+Get-Content database/migrations/007_create_admin_logs_table.sql | mysql -u root -p smart_travel_planner
 ```
 
 **Step 4: Update your** `.env` **file with your MySQL credentials**
@@ -283,14 +291,24 @@ Open `.env` and update the values:
 
 ```env
 PORT=3000
+
+# MySQL Database
 DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=smart_travel_planner
 DB_USER=root
 DB_PASSWORD=
+
+# Firebase Admin SDK
+# Get these from: Firebase Console → Project Settings → Service Accounts → Generate new private key
+# Download the JSON file and copy the values below
+# FIREBASE_PRIVATE_KEY must include the quotes: "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 FIREBASE_PROJECT_ID=
 FIREBASE_CLIENT_EMAIL=
 FIREBASE_PRIVATE_KEY=
+
+# OpenTripMap API
+# Get a free key from: https://opentripmap.io/register
 OPENTRIPMAP_API_KEY=
 ```
 
