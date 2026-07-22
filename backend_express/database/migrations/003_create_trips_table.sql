@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS trips (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT UNSIGNED NOT NULL,
+  destination_id BIGINT UNSIGNED,
+  title VARCHAR(255) NOT NULL,
+  destination_name VARCHAR(255),
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  budget DECIMAL(12, 2) DEFAULT 0.00,
+  currency VARCHAR(10) DEFAULT 'MYR',
+  notes TEXT,
+  status ENUM('planned', 'ongoing', 'completed') DEFAULT 'planned',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (destination_id) REFERENCES destinations(id) ON DELETE SET NULL
+);
