@@ -7,24 +7,54 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:mobile_flutter/main.dart';
+import 'package:mobile_flutter/app/app.dart';
+import 'package:mobile_flutter/providers/profile_provider.dart';
+import 'package:mobile_flutter/providers/trip_provider.dart';
+import 'package:mobile_flutter/providers/weather_provider.dart';
+import 'package:mobile_flutter/repositories/trip_repository.dart';
+import 'package:mobile_flutter/providers/auth_provider.dart';
+import 'package:mobile_flutter/screens/budget_screen.dart';
+import 'package:mobile_flutter/screens/home_screen.dart';
+import 'package:mobile_flutter/screens/profile_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('app launches with splash screen', (WidgetTester tester) async {
+    await tester.pumpWidget(const SmartTravelPlannerApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('Smart Travel Planner'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets('home dashboard shows quick actions section', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => TripProvider(MockTripRepository())),
+          ChangeNotifierProvider(create: (_) => WeatherProvider()),
+          ChangeNotifierProvider(create: (_) => ProfileProvider()),
+        ],
+        child: const MaterialApp(home: HomeScreen()),
+      ),
+    );
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Quick actions'), findsOneWidget);
+  });
+
+  testWidgets('profile screen shows travel preferences', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => ProfileProvider()),
+          ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ],
+        child: const MaterialApp(home: ProfileScreen()),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Travel preferences'), findsOneWidget);
   });
 }
