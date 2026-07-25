@@ -1,19 +1,52 @@
 class UserProfile {
-  final String id;
+  final String uid;
   final String name;
   final String email;
-  final String avatarUrl;
-  final String location;
-  final String bio;
+  final String phone;
+  final String country;
+  final String preferredCurrency;
+  final String preferredLanguage;
+  final String travelStyle;
+  final String emergencyContact;
 
   UserProfile({
-    required this.id,
+    required this.uid,
     required this.name,
     required this.email,
-    required this.avatarUrl,
-    required this.location,
-    required this.bio,
+    this.phone = '',
+    this.country = '',
+    this.preferredCurrency = 'USD',
+    this.preferredLanguage = 'English',
+    this.travelStyle = 'Balanced comfort',
+    this.emergencyContact = '',
   });
+
+  factory UserProfile.fromFirestore(Map<String, dynamic> data, String uid) {
+    return UserProfile(
+      uid: uid,
+      name: data['name'] as String? ?? '',
+      email: data['email'] as String? ?? '',
+      phone: data['phone'] as String? ?? '',
+      country: data['country'] as String? ?? '',
+      preferredCurrency: data['preCurrency'] as String? ?? 'USD',
+      preferredLanguage: data['preLanguage'] as String? ?? 'English',
+      travelStyle: data['preTravelStyle'] as String? ?? 'Balanced comfort',
+      emergencyContact: data['emerContact'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'country': country,
+      'preCurrency': preferredCurrency,
+      'preLanguage': preferredLanguage,
+      'preTravelStyle': travelStyle,
+      'emerContact': emergencyContact,
+    };
+  }
 }
 
 class Trip {

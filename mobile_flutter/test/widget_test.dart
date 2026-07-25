@@ -13,7 +13,6 @@ import 'package:mobile_flutter/providers/trip_provider.dart';
 import 'package:mobile_flutter/providers/weather_provider.dart';
 import 'package:mobile_flutter/repositories/trip_repository.dart';
 import 'package:mobile_flutter/providers/auth_provider.dart';
-import 'package:mobile_flutter/screens/budget_screen.dart';
 import 'package:mobile_flutter/screens/home_screen.dart';
 import 'package:mobile_flutter/screens/profile_screen.dart';
 import 'package:provider/provider.dart';

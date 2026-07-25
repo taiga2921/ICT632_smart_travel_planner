@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
+import '../models/app_models.dart';
 import '../providers/profile_provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -19,20 +20,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late final TextEditingController _languageController;
   late final TextEditingController _styleController;
   late final TextEditingController _emergencyController;
+  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
     final profile = context.read<ProfileProvider>().profile;
-    _nameController = TextEditingController(text: profile.name);
-    _emailController = TextEditingController(text: profile.email);
-    // Use default or mock values for others (as before)
-    _phoneController = TextEditingController(text: '+60 12 345 6789');
-    _countryController = TextEditingController(text: 'Malaysia');
-    _currencyController = TextEditingController(text: 'USD');
-    _languageController = TextEditingController(text: 'English');
-    _styleController = TextEditingController(text: 'Balanced comfort');
-    _emergencyController = TextEditingController(text: '+60 17 123 4567');
+    _nameController = TextEditingController(text: profile?.name ?? '');
+    _emailController = TextEditingController(text: profile?.email ?? '');
+    _phoneController = TextEditingController(text: profile?.phone ?? '');
+    _countryController = TextEditingController(text: profile?.country ?? '');
+    _currencyController = TextEditingController(text: profile?.preferredCurrency ?? 'USD');
+    _languageController = TextEditingController(text: profile?.preferredLanguage ?? 'English');
+    _styleController = TextEditingController(text: profile?.travelStyle ?? 'Balanced comfort');
+    _emergencyController = TextEditingController(text: profile?.emergencyContact ?? '');
   }
 
   @override
@@ -46,6 +47,42 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _styleController.dispose();
     _emergencyController.dispose();
     super.dispose();
+  }
+
+  Future<void> _save() async {
+    setState(() => _isSaving = true);
+
+    final profileProvider = context.read<ProfileProvider>();
+    final current = profileProvider.profile;
+    if (current == null) return;
+
+    final updated = UserProfile(
+      uid: current.uid,
+      name: _nameController.text.trim(),
+      email: current.email,
+      phone: _phoneController.text.trim(),
+      country: _countryController.text.trim(),
+      preferredCurrency: _currencyController.text.trim(),
+      preferredLanguage: _languageController.text.trim(),
+      travelStyle: _styleController.text.trim(),
+      emergencyContact: _emergencyController.text.trim(),
+    );
+
+    final error = await profileProvider.updateProfile(updated);
+
+    if (!mounted) return;
+    setState(() => _isSaving = false);
+
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error)),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile updated')),
+      );
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -102,7 +139,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             // ---- Email (read‑only) ----
             TextField(
               controller: _emailController,
-              enabled: false, // disables editing
+              enabled: false,
               decoration: const InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
@@ -192,21 +229,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: FilledButton(
-                    onPressed: () {
-                      // Here you could update the profile with new values
-                      // For now, show a snackbar and pop
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Profile updated')),
-                      );
-                      Navigator.of(context).pop();
-                    },
+                    onPressed: _isSaving ? null : _save,
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Text('Save'),
+                    child: _isSaving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Save'),
                   ),
                 ),
               ],

@@ -55,9 +55,6 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', service: 'Smart Travel Planner Backend' });
 });
 
-// Any request that starts with /api/profile
-// → send it to profileRoutes
-// etc...
 app.use('/api/profile', require('./routes/profileRoutes'));
 app.use('/api/trips', require('./routes/tripRoutes'));
 app.use('/api/itineraries', require('./routes/itineraryRoutes'));

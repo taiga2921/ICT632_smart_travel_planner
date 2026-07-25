@@ -29,13 +29,17 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final weatherProvider = context.watch<WeatherProvider>();
-    final profile = context.watch<ProfileProvider>().profile;
+    final profileProvider = context.watch<ProfileProvider>();
+    final profile = profileProvider.profile;
+    final userName = profile?.name ?? 'User';
+    final userLocation = (profile?.country ?? '').isNotEmpty ? profile!.country : 'Unknown';
 
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
             weatherProvider.refreshWeather();
+            profileProvider.fetchProfile();
           },
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
@@ -53,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          profile.name.split(' ').first,
+                          userName.split(' ').first,
                           style: Theme.of(context)
                               .textTheme
                               .headlineSmall
@@ -68,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 52,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: AppColors.primary.withOpacity(0.12),
+                      color: AppColors.primary.withValues(alpha: 0.12),
                     ),
                     child: Icon(
                       Icons.person,
@@ -81,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 16),
 
               // ---- Current location ----
-              _LocationCard(profile: profile),
+              _LocationCard(location: userLocation),
               const SizedBox(height: 16),
 
               // ---- Today's weather ----
@@ -98,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.16),
+                        color: AppColors.primary.withValues(alpha: 0.16),
                         blurRadius: 18,
                         offset: const Offset(0, 10),
                       )
@@ -112,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: Text(
@@ -230,9 +234,9 @@ class _HomeScreenState extends State<HomeScreen> {
 // ---- Helper widgets ----
 
 class _LocationCard extends StatelessWidget {
-  final dynamic profile; // Profile model
+  final String location;
 
-  const _LocationCard({required this.profile});
+  const _LocationCard({required this.location});
 
   @override
   Widget build(BuildContext context) {
@@ -244,7 +248,7 @@ class _LocationCard extends StatelessWidget {
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 6),
           )
@@ -255,7 +259,7 @@ class _LocationCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.12),
+              color: AppColors.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(Icons.location_on_outlined, color: AppColors.primary),
@@ -270,8 +274,8 @@ class _LocationCard extends StatelessWidget {
                   style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  '${profile.location}, Malaysia',
+                  Text(
+                    location,
                   style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 2),
@@ -300,7 +304,7 @@ class _WeatherMetric extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.16),
+          color: Colors.white.withValues(alpha: 0.16),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -351,7 +355,7 @@ class _ActionCard extends StatelessWidget {
             border: Border.all(color: AppColors.border),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 10,
                 offset: const Offset(0, 6),
               )
@@ -394,7 +398,7 @@ class _TravelTipCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.12),
+              color: AppColors.primary.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(Icons.tips_and_updates_outlined, color: AppColors.primary),

@@ -2,12 +2,15 @@ import '../models/app_models.dart';
 
 class MockData {
   static final UserProfile user = UserProfile(
-    id: 'u1',
+    uid: 'u1',
     name: 'Aisha Rahman',
     email: 'aisha@email.com',
-    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80',
-    location: 'Kuala Lumpur',
-    bio: 'Travel lover • Food explorer • Weekend planner',
+    phone: '+60 12 345 6789',
+    country: 'Malaysia',
+    preferredCurrency: 'USD',
+    preferredLanguage: 'English',
+    travelStyle: 'Balanced comfort',
+    emergencyContact: '+60 17 123 4567',
   );
 
   static final List<Trip> trips = [
