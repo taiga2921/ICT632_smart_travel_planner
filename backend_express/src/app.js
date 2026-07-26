@@ -59,19 +59,23 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', service: 'Smart Travel Planner Backend' });
 });
 
+// In house APIs
 app.use('/api/profile', require('./routes/profileRoutes'));
 app.use('/api/trips', require('./routes/tripRoutes'));
 app.use('/api/itineraries', require('./routes/itineraryRoutes'));
 app.use('/api/itinerary-items', require('./routes/itineraryItemRoutes'));
 app.use('/api/expenses', require('./routes/expenseRoutes'));
+
+// Third-party APIs
 app.use('/api/weather', require('./routes/weatherRoutes'));
 app.use('/api/geocode', require('./routes/geocodeRoutes'));
+
 app.use('/api/attractions', require('./routes/attractionRoutes'));
 app.use('/api/hotels', require('./routes/hotelRoutes'));
 app.use('/api/restaurants', require('./routes/restaurantRoutes'));
+
 app.use('/api/country-info', require('./routes/countryRoutes'));
 app.use('/api/locations', require('./routes/locationRoutes'));
-app.use('/api/admin', require('./routes/adminRoutes'));
 
 app.use(errorMiddleware);
 
