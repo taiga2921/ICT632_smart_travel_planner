@@ -6,10 +6,19 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
+
+  ssl:
+    process.env.DB_SSL === 'true'
+      ? {
+          rejectUnauthorized: false,
+        }
+      : undefined,
+
   waitForConnections: true,
   connectionLimit: 10,
-  // Keep DATE/DATETIME as raw strings so the API emits `YYYY-MM-DD` instead of a
-  // timezone-shifted ISO timestamp.
+  queueLimit: 0,
+  
+  // Keep DATE/DATETIME as raw strings so the API emits `YYYY-MM-DD` instead of a timezone-shifted ISO timestamp.
   dateStrings: ['DATE', 'DATETIME'],
 });
 

@@ -3,7 +3,7 @@
 **Project Code:** ITT632 Group Project
 **Project Title:** Smart Travel Planner
 **Document Name:** system-architecture.md
-**Version:** 2.0
+**Version:** 2.2
 **Date:** 2025
 
 ---
@@ -44,11 +44,11 @@
 
 Smart Travel Planner is a mobile application developed using Flutter that enables users to plan, organise, and manage travel activities in a structured and efficient manner. The application is designed to address the common challenges faced by modern travellers, including trip organisation, weather uncertainty at destinations, discovery of local tourist attractions, understanding destination country information, and managing travel budgets. By combining a custom in-house backend with multiple cloud-based services, the Smart Travel Planner delivers a comprehensive and connected travel management experience accessible from Android and iOS devices.
 
-The system is built upon a layered cloud architecture in which multiple services collaborate to provide the required functionality. Firebase Authentication provides secure user registration and login, ensuring that user identity is managed by a trusted and established cloud identity platform. Firebase Firestore serves as a supplementary cloud storage solution for lightweight data such as user profile metadata and application settings. Weather forecasts are retrieved in real time from the Open-Meteo API, a fully free and openly accessible weather data service that requires no registration. Tourist attractions, restaurants, and hotels are retrieved using SerpAPI, the cascading country / state / city picker is backed by the CountryStateCity API, while detailed country information such as currency, language, timezone, and national flag is retrieved from the RestCountries API.
+The system is built upon a layered cloud architecture in which multiple services collaborate to provide the required functionality. Firebase Authentication provides secure user registration and login, ensuring that user identity is managed by a trusted and established cloud identity platform. Firebase Firestore serves as a supplementary cloud storage solution for lightweight data such as user profile metadata and application settings. Firebase Storage stores profile photos. Weather forecasts are retrieved in real time from the Open-Meteo API, a fully free and openly accessible weather data service that requires no registration. Tourist attractions, restaurants, and hotels are retrieved using SerpAPI. Destination names for trips are entered by the user, and the home screen uses device GPS with the Flutter `geocoding` package for reverse geocoding.
 
 At the core of the system is the in-house Node.js and Express REST API, which acts as the central backend service. The Express API handles all structured business logic including trip planning, itinerary management, expense tracking, and data persistence using a MySQL 8.x relational database. The Flutter mobile application communicates with the Express API over HTTP, and the Express API in turn communicates with external cloud APIs and the MySQL database. During development and demonstration, the Express API runs on a local machine, making the setup accessible and cost-free for the student team.
 
-The Smart Travel Planner fulfils all Mobile Cloud Computing requirements by integrating seven distinct third-party cloud services, namely Firebase Authentication, Firebase Firestore, Firebase Storage, Open-Meteo, SerpAPI, RestCountries, and CountryStateCity, alongside one in-house web service in the form of the Node.js and Express REST API. The complete system demonstrates how a mobile application can leverage cloud computing to provide scalable, feature-rich functionality within a student project context and without requiring a paid infrastructure.
+The Smart Travel Planner fulfils all Mobile Cloud Computing requirements by integrating five distinct third-party cloud services, namely Firebase Authentication, Firebase Firestore, Firebase Storage, Open-Meteo, and SerpAPI, alongside one in-house web service in the form of the Node.js and Express REST API. The complete system demonstrates how a mobile application can leverage cloud computing to provide scalable, feature-rich functionality within a student project context and without requiring a paid infrastructure.
 
 ---
 
@@ -62,7 +62,7 @@ The following objectives define the scope and intended outcome of the Smart Trav
 4. To allow users to create and manage day-by-day itineraries, including individual itinerary items with time, location, and description.
 5. To allow users to retrieve real-time weather forecasts for their travel destinations using the Open-Meteo API.
 6. To allow users to discover tourist attractions, restaurants, and hotels at their destination using SerpAPI.
-7. To allow users to view detailed country information including currency, language, timezone, and national flag using the RestCountries API.
+7. To allow users to view destination-related reference information and explore attractions, hotels, and restaurants for a chosen destination.
 8. To allow users to record travel expenses and manage trip budgets through a dedicated budget tracker module.
 9. To integrate an in-house Node.js and Express REST API as the backend web service responsible for business logic, data management, and external API communication.
 10. To store all structured relational data including users, trips, itineraries, itinerary items, and expenses in a MySQL 8.x database managed by the Express backend.
@@ -84,7 +84,7 @@ The following features and components are included within the scope of this proj
 - Day-by-day itinerary management with itinerary items
 - Real-time weather forecast retrieval using Open-Meteo API
 - Tourist attraction, restaurant, and hotel search using SerpAPI
-- Country information display using RestCountries API
+- Destination detail views for exploring attractions, hotels, and restaurants
 - Travel budget and expense tracking
 - In-house Node.js and Express REST API as the backend web service
 - MySQL 8.x relational database for structured data storage
@@ -120,8 +120,7 @@ The primary user of the application is the Traveller. This user interacts with t
 - Add day-by-day itineraries to a trip
 - Add individual itinerary items to each itinerary day including time, location, and activity description
 - View weather forecasts for their travel destination
-- Search for and view tourist attractions at their destination
-- View country information including currency, language, and timezone
+- Search for and view tourist attractions, hotels, and restaurants at their destination
 - Record travel expenses and monitor their trip budget
 
 ### 4.2 Admin
@@ -237,19 +236,19 @@ The Admin role is intended for internal system management and data oversight. Th
 
 ---
 
-### 5.7 Country Information Module
+### 5.7 Destination Explorer Module
 
-**Purpose:** Provides users with detailed information about their travel destination country.
+**Purpose:** Helps users explore a chosen destination through attractions, hotels, and restaurants discovered via SerpAPI.
 
 **Main Features:**
-- Accept a country name or ISO code as input
-- Retrieve country data from the RestCountries API via the Express backend
-- Display currency, official language, timezone, capital city, region, and national flag
-- Provide useful reference information for travellers preparing for their destination
+- Open a destination detail view for a selected place name
+- Navigate to attractions, hotels, and restaurants search screens for that destination
+- Display top attraction results as a quick preview
+- Start a new trip from the destination context
 
-**Related Technology:** Flutter, Node.js + Express REST API, RestCountries API
+**Related Technology:** Flutter, Node.js + Express REST API, SerpAPI
 
-**Related Database or Cloud Service:** RestCountries API (external, no local database storage required)
+**Related Database or Cloud Service:** SerpAPI (external, no local database storage required)
 
 ---
 
@@ -294,7 +293,7 @@ The Admin role is intended for internal system management and data oversight. Th
 - Expose RESTful API endpoints for all application modules
 - Validate Firebase Authentication tokens for protected routes using Express middleware
 - Handle MySQL database operations through query functions and model classes
-- Communicate with external APIs including Open-Meteo, SerpAPI, CountryStateCity, and RestCountries
+- Communicate with external APIs including Open-Meteo and SerpAPI
 - Return structured JSON responses to the Flutter application
 - Implement role-based middleware to protect admin routes
 
@@ -311,14 +310,15 @@ The Admin role is intended for internal system management and data oversight. Th
 **Main Features:**
 - Firebase Authentication SDK integration within Flutter
 - Firebase Firestore read and write operations for profile and settings data
+- Firebase Storage uploads for profile photos
 - Open-Meteo API communication via the Express backend
-- SerpAPI and CountryStateCity API communication via the Express backend
-- RestCountries API communication via the Express backend
+- SerpAPI communication via the Express backend for attractions, restaurants, and hotels
+- Device GPS and reverse geocoding on the Flutter client using `geolocator` and `geocoding`
 - API key management and environment variable configuration using `.env`
 
 **Related Technology:** Flutter Firebase SDK, Node.js + Express, HTTP client libraries, dotenv
 
-**Related Database or Cloud Service:** Firebase Authentication, Firebase Firestore, Firebase Storage, Open-Meteo, SerpAPI, RestCountries, CountryStateCity
+**Related Database or Cloud Service:** Firebase Authentication, Firebase Firestore, Firebase Storage, Open-Meteo, SerpAPI
 
 ---
 
@@ -356,13 +356,13 @@ Open-Meteo is chosen as the weather forecast provider because it is a fully free
 
 SerpAPI is chosen as the place-discovery provider because a single free-tier key covers three of the app's search features: the Google Local engine returns tourist attractions and restaurants, while the Google Hotels engine returns accommodation with live pricing. Results include ratings, addresses and thumbnails, which is richer than the raw point-of-interest feeds the project first evaluated. The Express backend holds the key in `SERPAPI_KEY` and normalises the JSON before returning it to Flutter.
 
-### 6.9 CountryStateCity API
+### 6.9 Firebase Storage
 
-The CountryStateCity API is chosen to power the cascading country → state → city picker on the create-trip form. Letting users type a free-form destination produced inconsistent values, so trips now store a structured `"City, State, Country"` string selected from a shared dataset. The API is free, requires only a header key (`CSC_API_KEY`), and is proxied through the Express backend so the key is never shipped in the mobile app.
+Firebase Storage is chosen for profile photo uploads because it provides managed object storage that integrates directly with Firebase Authentication. Photos are stored under per-user paths, and access can be controlled with Firebase security rules. Storage is included under the Spark Plan at no cost for typical student-project usage and avoids hosting binary files in MySQL or on the Express server.
 
-### 6.10 RestCountries API
+### 6.10 Device GPS and Geocoding
 
-RestCountries is chosen for country information retrieval because it is entirely free, requires no API key or registration, and provides a comprehensive dataset including official country name, capital, currency, language, timezone, region, and national flag. The API is simple to integrate and returns consistent JSON responses, making it ideal for the country information module.
+The Flutter `geolocator` and `geocoding` packages are chosen for the home dashboard location experience. The app reads the device GPS position and reverse-geocodes it to a city name on the client, then requests weather for those coordinates through the Express Open-Meteo proxy. This keeps destination entry for trips as a simple destination name field and avoids depending on a separate third-party country or city lookup API.
 
 ### 6.11 Local In-House Web Service
 
@@ -384,11 +384,9 @@ A monorepo structure hosted on GitHub is chosen because it allows all team membe
 | **Open-Meteo API** | Third-Party Cloud Service | Real-time weather forecast retrieval by coordinates | Fully free, no API key or registration required; accurate weather data; simple REST interface | Free (No registration) | Weather Forecast Module |
 | **SerpAPI (Google Local)** | Third-Party Cloud Service | Tourist attraction and restaurant discovery | Returns live Google Local results with ratings, addresses and photos; single API for both attractions and restaurants | Free Tier | Attraction Finder Module |
 | **SerpAPI (Google Hotels)** | Third-Party Cloud Service | Hotel search by destination and stay dates | Live hotel pricing and availability from Google Hotels; shares the same API key as Google Local | Free Tier | Attraction Finder Module |
-| **RestCountries API** | Third-Party Cloud Service | Country information display | Completely free; no API key or registration needed; comprehensive country data in JSON format | Free (No registration) | Country Information Module |
-| **CountryStateCity API** | Third-Party Cloud Service | Location search for the cascading country / state / city picker | Free hierarchical location dataset; lets trips store a consistent, structured destination name | Free | Trip Planner Module |
 | **Render.com / Railway.app** *(Future)* | Cloud Hosting Platform | Future hosting of the Express API | Free tier hosting for Node.js applications; supports GitHub deployment; HTTPS enabled | Free Tier *(Future use)* | Express API Module *(Future Deployment)* |
 
-> The system integrates **seven distinct third-party cloud services**, satisfying the requirement of at least THREE third-party cloud services.
+> The system integrates **five distinct third-party cloud services**, satisfying the requirement of at least THREE third-party cloud services.
 
 ---
 
@@ -406,7 +404,7 @@ The Express REST API serves as the central backend service of the Smart Travel P
 - Validating incoming Firebase Authentication ID tokens using the Firebase Admin SDK
 - Performing full CRUD operations for trips, itineraries, itinerary items, and expenses against the MySQL database
 - Enforcing input validation and request constraints before processing data
-- Communicating with Open-Meteo, SerpAPI, CountryStateCity, and RestCountries APIs on behalf of the mobile application
+- Communicating with Open-Meteo and SerpAPI on behalf of the mobile application
 - Returning structured JSON responses to the Flutter frontend
 - Enforcing role-based access control for admin endpoints through dedicated middleware
 
@@ -424,7 +422,7 @@ The Express API connects to a MySQL 8.x database using the `mysql2` Node.js pack
 
 ### 8.6 How It Communicates with External APIs
 
-The Express API acts as a proxy and aggregator for external API calls. When the Flutter app requests weather data, attraction data, or country information, the request is sent to the Express API, which then makes the appropriate outbound HTTP call to Open-Meteo, SerpAPI, CountryStateCity, or RestCountries using the `axios` package. The Express API processes the response, extracts the relevant fields, and returns a structured JSON response to the Flutter application. This approach keeps external API keys secure on the server side.
+The Express API acts as a proxy and aggregator for external API calls. When the Flutter app requests weather data or place-discovery data, the request is sent to the Express API, which then makes the appropriate outbound HTTP call to Open-Meteo or SerpAPI using the `axios` package. The Express API processes the response, extracts the relevant fields, and returns a structured JSON response to the Flutter application. This approach keeps external API keys such as `SERPAPI_KEY` secure on the server side.
 
 ### 8.7 How It Separates Business Logic from the Mobile App
 
@@ -452,8 +450,7 @@ During development and demonstration, the Express API runs on `http://localhost:
 | Cloud Storage | Firebase Firestore | Latest (Spark Plan) | NoSQL cloud database for user profile metadata and application settings |
 | Weather API | Open-Meteo | Free, No Version Lock | Free real-time weather forecast data by geographic coordinates |
 | Places API | SerpAPI (Google Local + Google Hotels) | Free Tier | Tourist attraction, restaurant, and hotel discovery |
-| Location API | CountryStateCity | Free | Country, state, and city lookup for the trip location picker |
-| Country API | RestCountries | Free, No Version Lock | Country information including currency, language, timezone, and flag |
+| Geocoding | geocoding (Flutter package) | Latest | Reverse geocoding — converts GPS coordinates to city name on the home screen |
 | Version Control | GitHub | N/A | Source code hosting, team collaboration, and version control |
 | Repository Strategy | Monorepo | N/A | Single repository containing both Flutter and Express in separate subfolders |
 | API Testing | Postman | Latest | Manual and automated testing of Express REST API endpoints |
@@ -472,7 +469,7 @@ The Smart Travel Planner follows a layered client-server architecture in which t
 1. **Mobile Application Layer:** The Flutter app handles the user interface and sends API requests to Firebase and the Express backend.
 2. **Cloud Authentication and Storage Layer:** Firebase Authentication manages user identity, and Firestore stores selected lightweight cloud data.
 3. **In-House Backend Layer:** The Node.js and Express REST API handles business logic, MySQL database operations, and external API communication.
-4. **External API Layer:** Open-Meteo, SerpAPI, CountryStateCity, and RestCountries provide travel-related data to the Express backend.
+4. **External API Layer:** Open-Meteo and SerpAPI provide travel-related data to the Express backend. Device GPS and the Flutter geocoding package supply the home-screen location name.
 
 The communication flow is as follows:
 
@@ -505,9 +502,8 @@ flowchart TD
         E[Open-Meteo\nWeather]
         F[SerpAPI Google Local\nAttractions & Restaurants]
         FH[SerpAPI Google Hotels\nHotel Search]
-        G[RestCountries\nCountry Info]
-        L[CountryStateCity API\nLocation Search]
         GEO[Device GPS\ngeolocator]
+        GEOCODE[Geocoding Package\nReverse Geocoding]
     end
 
     A -->|Auth| B
@@ -515,12 +511,11 @@ flowchart TD
     A <-->|Profile metadata| H
     A -->|API requests| C
     A -->|GPS| GEO
+    A -->|Reverse geocode| GEOCODE
     C --> D
     C -->|Weather| E
     C -->|Attractions/Restaurants| F
     C -->|Hotels| FH
-    C -->|Country info| G
-    C -->|Location search| L
     B -->|Token| A
     C -->|JSON| A
 ```
@@ -576,7 +571,7 @@ flowchart TD
 ### 11.5 Attraction Search Flow
 
 1. **User Action:** The user opens the Attraction Finder screen and enters a destination city or geographic coordinates.
-2. **Flutter Process:** Flutter sends a GET request to `/api/attractions?lat={lat}&lon={lon}&radius={radius}` with the Firebase ID token.
+2. **Flutter Process:** Flutter sends a GET request to `/api/attractions?location={location}&query={query}` with the Firebase ID token, where `location` is the destination name string (e.g. "Kuala Lumpur") and `query` is the search term (e.g. "tourist attractions").
 3. **Express API Process:** Express calls the SerpAPI Google Local engine using `axios` with the provided parameters and retrieves a list of nearby attractions.
 4. **SerpAPI Response:** SerpAPI returns a list of places with names, types, ratings, addresses, and thumbnails.
 5. **Express Processing:** Express processes the attraction data and returns a structured JSON list to the Flutter app.
@@ -584,14 +579,14 @@ flowchart TD
 
 ---
 
-### 11.6 Country Information Retrieval Flow
+### 11.6 Home Location and Reverse Geocoding Flow
 
-1. **User Action:** The user opens the Country Information screen and enters or selects a country name.
-2. **Flutter Process:** Flutter sends a GET request to `/api/country-info?name={country}` with the Firebase ID token.
-3. **Express API Process:** Express calls the RestCountries API using `axios` with the country name and retrieves the full country data object.
-4. **RestCountries Response:** RestCountries returns country data including official name, capital, currency, language, timezone, region, and flag URL.
-5. **Express Processing:** Express extracts the relevant fields and returns a structured JSON response to Flutter.
-6. **Response to User:** Flutter displays the country information on the Country Information screen including the national flag image loaded from the returned URL.
+1. **User Action:** The user opens the Home Dashboard after signing in.
+2. **Flutter Process:** Flutter requests location permission through `geolocator` and reads the current GPS coordinates.
+3. **Geocoding Process:** Flutter reverse-geocodes the coordinates with the `geocoding` package to obtain a human-readable city name for the dashboard header.
+4. **Express API Process:** Flutter sends a GET request to `/api/weather?lat={lat}&lon={lon}` with the Firebase ID token.
+5. **Open-Meteo Response:** Express proxies the coordinates to Open-Meteo and returns current conditions for the home weather summary card.
+6. **Response to User:** Flutter displays the detected city name, current weather, and trip/expense summary stats on the home screen.
 
 ---
 
@@ -649,11 +644,7 @@ flowchart TD
 | GET | `/api/attractions` | Retrieve attractions by location via SerpAPI (`?location=&query=`) | Yes | Attraction Finder |
 | GET | `/api/hotels` | Hotel search via SerpAPI (`?query=&check_in=&check_out=`) | Yes | Attraction Finder |
 | GET | `/api/restaurants` | Restaurant search via SerpAPI (`?location=&query=`) | Yes | Attraction Finder |
-| GET | `/api/country-info` | Retrieve country information by name (`?name=`) | Yes | Country Information |
-| **Location Search** | | | | |
-| GET | `/api/locations/countries` | List all countries | Yes | Trip Planner |
-| GET | `/api/locations/countries/:ciso/states` | List states of a country | Yes | Trip Planner |
-| GET | `/api/locations/countries/:ciso/states/:siso/cities` | List cities of a state | Yes | Trip Planner |
+| GET | `/api/geocode` | Reverse geocode coordinates to a place name (`?lat=&lon=`) | Yes | Weather Forecast, Home Dashboard |
 | **Admin** | | | | |
 | GET | `/api/admin/users` | List all registered users (admin only) | Yes (Admin) | Admin Management |
 | GET | `/api/admin/trips` | List all trips in the system (admin only) | Yes (Admin) | Admin Management |
@@ -988,24 +979,19 @@ smart_travel_planner/
 │   ├── database/
 │   │   ├── migrations/
 │   │   └── seeders/
-│   ├── tests/
 │   ├── .env.example
 │   ├── .nvmrc
 │   ├── package.json
-│   ├── package-lock.json
-│   └── README.md
+│   └── package-lock.json
 │
 ├── docs/
-│   ├── system_architecture.md
-│   ├── database_design.md
-│   ├── api-documentation.md
-│   └── report-draft.md
+│   ├── github-workflow.md
+│   └── system-architecture.md
 │
 ├── postman/
-│   └── smart_travel_planner_api.postman_collection.json
+│   └── test.txt
 │
-├── README.md
-└── .gitignore
+└── README.md
 ```
 
 ### 16.2 Why One Repository Is Used
@@ -1027,77 +1013,100 @@ The `docs/` folder stores all project documentation files. The `postman/` folder
 ```
 mobile_flutter/lib/
 ├── main.dart
-├── config/
-│   ├── app_config.dart
-│   └── firebase_options.dart
+├── firebase_options.dart
+├── app_config.dart
+├── app/
+│   └── app.dart
+├── constants/
+│   └── app_colors.dart
 ├── models/
-│   ├── user_model.dart
-│   ├── trip_model.dart
-│   ├── itinerary_model.dart
-│   ├── itinerary_item_model.dart
-│   ├── expense_model.dart
-│   └── destination_model.dart
+│   └── app_models.dart
 ├── providers/
 │   ├── auth_provider.dart
-│   ├── trip_provider.dart
+│   ├── attraction_provider.dart
+│   ├── budget_provider.dart
+│   ├── country_provider.dart
+│   ├── hotel_provider.dart
 │   ├── itinerary_provider.dart
-│   ├── expense_provider.dart
+│   ├── profile_provider.dart
+│   ├── restaurant_provider.dart
+│   ├── trip_provider.dart
 │   └── weather_provider.dart
-├── routes/
-│   └── app_routes.dart
+├── repositories/
+│   └── trip_repository.dart
 ├── screens/
-│   ├── auth/
-│   │   ├── login_screen.dart
-│   │   └── register_screen.dart
-│   ├── home/
-│   │   └── home_screen.dart
-│   ├── trip/
-│   │   ├── trip_list_screen.dart
-│   │   ├── create_trip_screen.dart
-│   │   └── trip_detail_screen.dart
-│   ├── itinerary/
-│   │   └── itinerary_screen.dart
-│   ├── weather/
-│   │   └── weather_screen.dart
-│   ├── attraction/
-│   │   └── attraction_screen.dart
-│   ├── country/
-│   │   └── country_info_screen.dart
-│   ├── budget/
-│   │   └── budget_tracker_screen.dart
-│   └── profile/
-│       └── profile_screen.dart
+│   ├── about_screen.dart
+│   ├── attraction_detail_screen.dart
+│   ├── attractions_screen.dart
+│   ├── auth_screen.dart
+│   ├── budget_screen.dart
+│   ├── country_screen.dart
+│   ├── create_trip_screen.dart
+│   ├── destination_detail_screen.dart
+│   ├── edit_profile_screen.dart
+│   ├── forgot_password_screen.dart
+│   ├── home_screen.dart
+│   ├── hotel_detail_screen.dart
+│   ├── hotel_screen.dart
+│   ├── itinerary_screen.dart
+│   ├── main_shell.dart
+│   ├── notifications_screen.dart
+│   ├── profile_screen.dart
+│   ├── register_screen.dart
+│   ├── restaurant_detail_screen.dart
+│   ├── restaurant_screen.dart
+│   ├── search_screen.dart
+│   ├── settings_screen.dart
+│   ├── splash_screen.dart
+│   ├── trip_detail_screen.dart
+│   ├── trips_screen.dart
+│   ├── verification_screen.dart
+│   └── weather_screen.dart
 ├── services/
 │   ├── api_service.dart
-│   ├── auth_service.dart
-│   ├── firestore_service.dart
-│   ├── weather_service.dart
 │   ├── attraction_service.dart
-│   └── country_service.dart
+│   ├── auth_service.dart
+│   ├── country_service.dart
+│   ├── firestore_service.dart
+│   ├── hotel_service.dart
+│   ├── location_service.dart
+│   ├── restaurant_service.dart
+│   └── weather_service.dart
+├── theme/
+│   └── app_theme.dart
 ├── utils/
-│   ├── constants.dart
-│   ├── helpers.dart
-│   └── validators.dart
+│   ├── location_helper.dart
+│   └── weather_utils.dart
 └── widgets/
-    ├── custom_button.dart
-    ├── custom_text_field.dart
+    ├── forecast_day_card.dart
+    ├── location_picker_sheet.dart
+    ├── primary_button.dart
+    ├── profile_avatar.dart
+    ├── profile_stat_card.dart
+    ├── rating_stars.dart
+    ├── result_card.dart
+    ├── section_header.dart
     ├── trip_card.dart
-    ├── expense_card.dart
-    └── loading_indicator.dart
+    └── trip_form.dart
 ```
 
 ### 17.1 Folder Descriptions
 
-| Folder | Purpose |
+| Folder or File | Purpose |
 |---|---|
-| `config/` | Application-wide configuration including API base URL and Firebase options generated by FlutterFire CLI |
-| `models/` | Dart data model classes representing API response structures with `fromJson` and `toJson` methods |
-| `providers/` | State management classes using Provider or Riverpod for reactive UI updates across screens |
-| `routes/` | Centralised named route definitions and navigation configuration |
-| `screens/` | Individual screen widgets organised by feature module, each mapped to a named route |
-| `services/` | Service classes that encapsulate HTTP API calls, Firebase SDK interactions, and external API requests |
-| `utils/` | Utility functions, constant values such as API base URL, and input validation helpers |
-| `widgets/` | Reusable custom widget components such as buttons, cards, and form fields used across multiple screens |
+| `main.dart` | Application entry point; initialises Firebase and runs the app |
+| `firebase_options.dart` | Firebase project configuration generated by FlutterFire CLI |
+| `app_config.dart` | Application-wide constants including API base URL and default location settings |
+| `app/app.dart` | Root widget; sets up `MultiProvider` with all registered providers and `MaterialApp` routing |
+| `constants/` | App-wide constant values; `app_colors.dart` defines the colour palette |
+| `models/app_models.dart` | All Dart model classes (`TripModel`, `ItineraryModel`, `ExpenseModel`, etc.) with `fromJson` and `toJson` methods |
+| `providers/` | State management classes using `Provider` / `ChangeNotifier` for reactive UI updates; one provider per feature domain |
+| `repositories/trip_repository.dart` | HTTP client layer for all trip-related API calls (trips, itineraries, items, expenses); handles auth token injection |
+| `screens/` | Individual screen widgets; one file per screen; navigation is handled via `MaterialPageRoute` and named routes |
+| `services/` | Service classes that call the Express REST API or Firebase SDK; one file per external integration |
+| `theme/app_theme.dart` | Material 3 theme configuration for the app |
+| `utils/` | Utility helpers: `location_helper.dart` wraps the `geolocator` permission flow; `weather_utils.dart` maps WMO weather codes to labels and icons |
+| `widgets/` | Reusable custom widgets used across multiple screens |
 
 ---
 
@@ -1110,43 +1119,58 @@ backend_express/src/
 │   ├── db.js
 │   └── firebase.js
 ├── controllers/
-│   ├── profileController.js
-│   ├── tripController.js
-│   ├── itineraryController.js
-│   ├── itineraryItemController.js
-│   ├── expenseController.js
-│   ├── weatherController.js
+│   ├── adminController.js
 │   ├── attractionController.js
 │   ├── countryController.js
-│   └── adminController.js
+│   ├── expenseController.js
+│   ├── geocodeController.js
+│   ├── hotelController.js
+│   ├── itineraryController.js
+│   ├── itineraryItemController.js
+│   ├── locationController.js
+│   ├── profileController.js
+│   ├── restaurantController.js
+│   ├── tripController.js
+│   └── weatherController.js
 ├── middleware/
-│   ├── firebaseAuthMiddleware.js
 │   ├── adminMiddleware.js
 │   ├── errorMiddleware.js
+│   ├── firebaseAuthMiddleware.js
+│   ├── normalizeBodyMiddleware.js
 │   └── validateMiddleware.js
 ├── models/
-│   ├── userModel.js
-│   ├── tripModel.js
-│   ├── itineraryModel.js
-│   ├── itineraryItemModel.js
+│   ├── destinationModel.js
 │   ├── expenseModel.js
-│   └── destinationModel.js
+│   ├── itineraryItemModel.js
+│   ├── itineraryModel.js
+│   ├── tripModel.js
+│   └── userModel.js
 ├── routes/
-│   ├── profileRoutes.js
-│   ├── tripRoutes.js
-│   ├── itineraryRoutes.js
-│   ├── expenseRoutes.js
-│   ├── weatherRoutes.js
+│   ├── adminRoutes.js
 │   ├── attractionRoutes.js
 │   ├── countryRoutes.js
-│   └── adminRoutes.js
+│   ├── expenseRoutes.js
+│   ├── geocodeRoutes.js
+│   ├── hotelRoutes.js
+│   ├── itineraryItemRoutes.js
+│   ├── itineraryRoutes.js
+│   ├── locationRoutes.js
+│   ├── profileRoutes.js
+│   ├── restaurantRoutes.js
+│   ├── tripRoutes.js
+│   └── weatherRoutes.js
 ├── services/
-│   ├── weatherService.js
 │   ├── attractionService.js
-│   └── countryService.js
+│   ├── countryService.js
+│   ├── geocodeService.js
+│   ├── hotelService.js
+│   ├── locationService.js
+│   ├── restaurantService.js
+│   └── weatherService.js
 └── utils/
-    ├── responseHelper.js
-    └── constants.js
+    ├── constants.js
+    ├── requestHelper.js
+    └── responseHelper.js
 
 backend_express/database/
 ├── migrations/
@@ -1158,24 +1182,36 @@ backend_express/database/
 │   ├── 006_create_expenses_table.sql
 │   └── 007_create_admin_logs_table.sql
 └── seeders/
-    ├── users_seeder.sql
-    └── destinations_seeder.sql
+    ├── destinations_seeder.sql
+    └── users_seeder.sql
 ```
 
 ### 18.1 Folder Descriptions
 
 | Folder or File | Purpose |
 |---|---|
-| `app.js` | Entry point for the Express application; initialises middleware, routes, and the HTTP server |
-| `config/` | Database connection configuration (`db.js`) and Firebase Admin SDK initialisation (`firebase.js`) |
-| `controllers/` | Request and response handler functions for each API endpoint; calls services or models to retrieve data |
-| `middleware/` | Express middleware functions for Firebase token authentication, admin role checking, error handling, and input validation |
-| `models/` | Database query functions for each MySQL table using the `mysql2` package; abstracts raw SQL from controllers |
-| `routes/` | Express Router definitions mapping HTTP methods and endpoint paths to controller functions |
-| `services/` | Business logic and external API communication; `weatherService.js`, `attractionService.js`, and `countryService.js` call external APIs using `axios` |
-| `utils/` | Shared utility functions such as standardised JSON response helpers and constant values |
-| `database/migrations/` | SQL migration files containing `CREATE TABLE` statements for initialising the MySQL schema |
-| `database/seeders/` | SQL seeder files for inserting initial or test data into the database |
+| `app.js` | Entry point; initialises environment validation, middleware stack, all route mounts, and the HTTP server |
+| `config/db.js` | MySQL connection pool using `mysql2/promise`; `dateStrings` option ensures dates are returned as `YYYY-MM-DD` strings |
+| `config/firebase.js` | Firebase Admin SDK initialisation using service account credentials from `.env` |
+| `controllers/` | Request/response handlers for each route group; calls services or models and returns JSON via `responseHelper` |
+| `controllers/geocodeController.js` | Reverse geocodes a `lat`/`lon` pair to a human-readable place name for the home dashboard |
+| `controllers/hotelController.js` | Hotel search via SerpAPI Google Hotels engine |
+| `controllers/restaurantController.js` | Restaurant search via SerpAPI Google Local engine |
+| `middleware/normalizeBodyMiddleware.js` | Converts snake_case request body keys to camelCase so controllers work with either format |
+| `middleware/validateMiddleware.js` | Validates required fields in request body or query string; returns 422 on failure |
+| `models/` | Raw SQL query functions per table using `mysql2`; no ORM |
+| `routes/geocodeRoutes.js` | `GET /api/geocode` — reverse geocoding endpoint |
+| `routes/hotelRoutes.js` | `GET /api/hotels` — hotel search |
+| `routes/itineraryItemRoutes.js` | `PUT /api/itinerary-items/:id` and `DELETE /api/itinerary-items/:id` |
+| `routes/restaurantRoutes.js` | `GET /api/restaurants` — restaurant search |
+| `services/geocodeService.js` | Calls Open-Meteo or a geocoding API to convert coordinates to a place name |
+| `services/hotelService.js` | Calls SerpAPI Google Hotels engine and returns hotel results |
+| `services/restaurantService.js` | Calls SerpAPI Google Local engine for restaurant results |
+| `utils/requestHelper.js` | `pick(body, key, fallback)` — reads optional fields from a request body, only falling back when the key is genuinely absent (prevents accidental clearing of nullable columns being blocked) |
+| `utils/responseHelper.js` | Standardised JSON response functions: `success()`, `created()`, `error()` |
+| `utils/constants.js` | Shared app constants: `TRIP_STATUS`, `USER_ROLES`, `ITINERARY_ITEM_TYPES`, `EXPENSE_CATEGORIES` |
+| `database/migrations/` | SQL `CREATE TABLE` files run once to initialise the schema |
+| `database/seeders/` | SQL files for inserting initial test data |
 
 ---
 
@@ -1234,14 +1270,14 @@ backend_express/database/
 - Firestore service class for profile and settings data read and write
 - Open-Meteo API service integration in the Express backend
 - SerpAPI service integration in the Express backend
-- RestCountries API service integration in the Express backend
-- Flutter service classes for weather, attraction, and country screens
+- Firebase Storage profile photo upload in Flutter
+- Flutter service classes for weather, attraction, hotel, and restaurant screens
 
 **Suggested Branches:**
 - `feature/firebase-auth`
 - `feature/weather-api`
 - `feature/attraction-api`
-- `feature/country-api`
+- `feature/serpapi-hotels-restaurants`
 
 ---
 
@@ -1284,7 +1320,7 @@ feat: add weather API service
 feat: add MySQL schema for trips
 feat: add Firebase Firestore profile sync
 feat: add SerpAPI attraction service
-feat: add RestCountries country info endpoint
+feat: add hotel and restaurant search screens
 fix: resolve itinerary loading issue
 fix: correct budget total calculation logic
 docs: update system architecture document
@@ -1317,7 +1353,7 @@ The following security measures are implemented across the Smart Travel Planner 
 
 ### 20.4 Environment Variables and API Key Protection
 
-- All sensitive configuration values including MySQL credentials, the SerpAPI key (`SERPAPI_KEY`), the CountryStateCity key (`CSC_API_KEY`), and Firebase service account credentials are stored in `backend_express/.env`.
+- All sensitive configuration values including MySQL credentials, the SerpAPI key (`SERPAPI_KEY`), and Firebase service account credentials are stored in `backend_express/.env`.
 - The `.env` file is listed in `.gitignore` and is never committed to the repository.
 - The repository includes a `.env.example` file with placeholder values to guide team members in setting up their local environment.
 
@@ -1422,7 +1458,7 @@ If remote hosting is required, the Express API can be deployed to **Render.com**
 
 ### 22.1 Unit Testing
 
-- Individual service functions in the Express backend such as `weatherService.js`, `attractionService.js`, and `countryService.js` are tested in isolation to verify that external API responses are correctly parsed and formatted.
+- Individual service functions in the Express backend such as `weatherService.js`, `attractionService.js`, `hotelService.js`, and `restaurantService.js` are tested in isolation to verify that external API responses are correctly parsed and formatted.
 
 ### 22.2 API Testing Using Postman
 
@@ -1442,7 +1478,7 @@ If remote hosting is required, the Express API can be deployed to **Render.com**
 
 ### 22.5 External API Testing
 
-- Open-Meteo, SerpAPI, CountryStateCity, and RestCountries API endpoints are tested directly using a browser or Postman before Express integration.
+- Open-Meteo and SerpAPI endpoints are tested directly using a browser or Postman before Express integration.
 - Express service classes are tested to confirm they correctly handle API responses and error cases.
 
 ### 22.6 Integration Testing
@@ -1469,20 +1505,25 @@ If remote hosting is required, the Express API can be deployed to **Render.com**
 | Screen | Contents |
 |---|---|
 | **Splash Screen** | Application logo, loading animation, redirect to login or home based on authentication state |
-| **Login Screen** | Email and password input fields, login button, navigation link to the registration screen |
-| **Register Screen** | Name, email, and password input fields, register button, navigation link to the login screen |
-| **Home Dashboard** | GPS-based weather, time greeting, user photo, trip/expense stats, feature cards |
-| **Trip List Screen** | Four tabs: All / Current / Planned / Completed, no search filter button |
-| **Create Trip Screen** | Single form: title, cascading location picker, dates, budget, currency, notes |
-| **Trip Detail Screen** | Trip info, weather per trip date, itinerary list auto-generated per date |
-| **Itinerary Screen** | Per-date items list, add/edit/delete items with time/type/location |
-| **Weather Forecast Screen** | Destination or coordinate input, current weather summary, 7-day forecast with temperature and condition icons |
-| **Attraction Finder Screen** | Destination input, list of nearby attractions with name, category, and description |
-| **Country Information Screen** | Country name input, display of national flag, capital, currency, official language, timezone, and region |
-| **Budget Tracker Screen** | Per-trip expenses, category breakdown, progress bar |
-| **Profile Screen** | Photo, name, email, stats — no role/preferences |
-| **Edit Profile Screen** | Photo upload, email change, password change only |
-| **Admin Dashboard** *(Optional)* | User list table, trip list table, delete actions for admin role users |
+| **Login / Auth Screen** | Email and password input fields, login button, navigation link to the registration screen and forgot password screen |
+| **Register Screen** | Name, email, and password input fields, register button |
+| **Home Dashboard** | Time-based greeting with user first name; circular profile avatar (top right, taps to Profile); GPS-based location detected via `geolocator` and reverse geocoded; weather summary card with current temperature and condition; stat cards showing total trip count and total spent; quick-access feature grid (Explore Trips, Weather, Attractions) |
+| **Trip List Screen** | Four tabs: All / Current / Planned / Completed; `TripCard` list per tab; FAB navigates to Create Trip |
+| **Create Trip Screen** | Single-page form: title, destination name, start/end date pickers, budget amount, currency dropdown, notes; submits to `POST /api/trips` |
+| **Trip Detail Screen** | Trip info card (title, destination, dates, budget, status badge, notes); edit and delete buttons; weather outlook section with per-date forecast cards (coordinates entered manually); itinerary section listing auto-generated daily rows |
+| **Itinerary Screen** | Date header (read-only) with editable title and notes; list of itinerary items per day with time, type badge, title, and location; FAB opens add-item bottom sheet; swipe or icon to edit/delete items |
+| **Weather Forecast Screen** | Latitude and longitude input with search; current temperature, weather condition label and icon; 7-day horizontal scrollable forecast with max/min temperature and condition icon per day |
+| **Attractions Screen** | Location text field and query text field; search button; scrollable list of attraction results with thumbnail, name, category, rating, and address; tapping a card navigates to Attraction Detail |
+| **Attraction Detail Screen** | Full-width thumbnail; name, type badge, rating stars and review count; address card; description text |
+| **Hotel Screen** | Location/query input with check-in and check-out date pickers; search button; list of hotel results with thumbnail, name, rating, and price per night; tapping navigates to Hotel Detail |
+| **Hotel Detail Screen** | Full-width thumbnail; name, rating, review count; price per night card; description; "Visit Website" button |
+| **Restaurant Screen** | Location text field and cuisine/query text field; search button; list of restaurant results with thumbnail, name, type, rating, address, and opening hours |
+| **Restaurant Detail Screen** | Full-width thumbnail; name, type badge, rating stars; address card; opening hours card |
+| **Budget Tracker Screen** | Total budget, total spent, and remaining balance displayed prominently; progress bar; category breakdown row; scrollable expense list with category icon, title, date, and amount; FAB opens add-expense bottom sheet |
+| **Profile Screen** | Circular avatar with initials fallback; display name and email; trip count and total spent stats; "Edit Profile" button; "Logout" button |
+| **Edit Profile Screen** | Circular avatar with camera overlay (tapping opens gallery/camera picker, uploads to Firebase Storage); name field; email field; new password and confirm password fields; Save button |
+| **Destination Detail Screen** | Destination name heading; explore chips for Attractions, Hotels, and Restaurants; top 5 attractions list; "Create trip" button |
+| **Admin Dashboard** *(Admin role only)* | User list table; trip list table; delete actions via `DELETE /api/admin/trips/:id` |
 
 ---
 
@@ -1503,7 +1544,8 @@ The following screenshots will be captured from the working application and inse
 | **Itinerary Screen** | *(Screenshot to be added)* |
 | **Weather Forecast Screen** | *(Screenshot to be added)* |
 | **Attraction Finder Screen** | *(Screenshot to be added)* |
-| **Country Information Screen** | *(Screenshot to be added)* |
+| **Hotel Search Screen** | *(Screenshot to be added)* |
+| **Restaurant Search Screen** | *(Screenshot to be added)* |
 | **Budget Tracker Screen** | *(Screenshot to be added)* |
 | **Profile Screen** | *(Screenshot to be added)* |
 | **Admin Dashboard** | *(Screenshot to be added, if applicable)* |
@@ -1546,7 +1588,7 @@ The following improvements are recommended for future versions of the Smart Trav
 
 ## 27. Conclusion
 
-The Smart Travel Planner system architecture demonstrates a practical and cost-effective approach to mobile cloud computing that satisfies all requirements of the ITT632 group project. The system integrates seven distinct third-party cloud services, namely Firebase Authentication, Firebase Firestore, Firebase Storage, Open-Meteo, SerpAPI, RestCountries, and CountryStateCity, fulfilling and exceeding the minimum requirement of at least three third-party cloud services. All seven services are available free of charge, making the architecture entirely accessible without any financial cost to the student team.
+The Smart Travel Planner system architecture demonstrates a practical and cost-effective approach to mobile cloud computing that satisfies all requirements of the ITT632 group project. The system integrates five distinct third-party cloud services, namely Firebase Authentication, Firebase Firestore, Firebase Storage, Open-Meteo, and SerpAPI, fulfilling and exceeding the minimum requirement of at least three third-party cloud services. All five services are available free of charge, making the architecture entirely accessible without any financial cost to the student team.
 
 The in-house Node.js and Express REST API serves as the backbone of the system, centralising business logic, managing the MySQL 8.x relational database, and acting as a secure intermediary between the Flutter mobile application and the external API services. This layered architecture ensures that sensitive API keys and database credentials remain on the server side, that data integrity is maintained through parameterised MySQL queries, and that the Flutter application remains lightweight and focused on the user experience.
 
@@ -1565,15 +1607,14 @@ The overall architecture is realistic, cost-effective, and implementable within 
 1. Firebase. (2024). *Firebase Documentation*. Google LLC. https://firebase.google.com/docs
 2. Open-Meteo. (2024). *Open-Meteo API Documentation*. https://open-meteo.com/en/docs
 3. SerpAPI. (2024). *SerpAPI Documentation*. https://serpapi.com/search-api
-4. RestCountries. (2024). *RestCountries API Documentation*. https://restcountries.com
-5. Node.js Foundation. (2024). *Node.js Documentation*. https://nodejs.org/en/docs
-6. Express.js. (2024). *Express.js Documentation*. https://expressjs.com
-7. Flutter. (2024). *Flutter Documentation*. Google LLC. https://docs.flutter.dev
-8. MySQL. (2024). *MySQL 8.0 Reference Manual*. Oracle Corporation. https://dev.mysql.com/doc/refman/8.0/en
-9. FVM. (2024). *Flutter Version Management Documentation*. https://fvm.app/docs
-10. nvm. (2024). *Node Version Manager Documentation*. https://github.com/nvm-sh/nvm
-11. Render. (2024). *Render Documentation*. https://docs.render.com
-12. Railway. (2024). *Railway Documentation*. https://docs.railway.app
+4. Node.js Foundation. (2024). *Node.js Documentation*. https://nodejs.org/en/docs
+5. Express.js. (2024). *Express.js Documentation*. https://expressjs.com
+6. Flutter. (2024). *Flutter Documentation*. Google LLC. https://docs.flutter.dev
+7. MySQL. (2024). *MySQL 8.0 Reference Manual*. Oracle Corporation. https://dev.mysql.com/doc/refman/8.0/en
+8. FVM. (2024). *Flutter Version Management Documentation*. https://fvm.app/docs
+9. nvm. (2024). *Node Version Manager Documentation*. https://github.com/nvm-sh/nvm
+10. Render. (2024). *Render Documentation*. https://docs.render.com
+11. Railway. (2024). *Railway Documentation*. https://docs.railway.app
 13. GitHub. (2024). *GitHub Documentation*. Microsoft. https://docs.github.com
 
 ---
