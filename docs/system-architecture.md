@@ -3,7 +3,7 @@
 **Project Code:** ITT632 Group Project
 **Project Title:** Smart Travel Planner
 **Document Name:** system-architecture.md
-**Version:** 2.0
+**Version:** 2.1
 **Date:** 2025
 
 ---
@@ -454,6 +454,7 @@ During development and demonstration, the Express API runs on `http://localhost:
 | Places API | SerpAPI (Google Local + Google Hotels) | Free Tier | Tourist attraction, restaurant, and hotel discovery |
 | Location API | CountryStateCity | Free | Country, state, and city lookup for the trip location picker |
 | Country API | RestCountries | Free, No Version Lock | Country information including currency, language, timezone, and flag |
+| Geocoding | geocoding (Flutter package) | Latest | Reverse geocoding — converts GPS coordinates to city name on the home screen |
 | Version Control | GitHub | N/A | Source code hosting, team collaboration, and version control |
 | Repository Strategy | Monorepo | N/A | Single repository containing both Flutter and Express in separate subfolders |
 | API Testing | Postman | Latest | Manual and automated testing of Express REST API endpoints |
@@ -508,6 +509,7 @@ flowchart TD
         G[RestCountries\nCountry Info]
         L[CountryStateCity API\nLocation Search]
         GEO[Device GPS\ngeolocator]
+        GEOCODE[Geocoding Package\nReverse Geocoding]
     end
 
     A -->|Auth| B
@@ -515,6 +517,7 @@ flowchart TD
     A <-->|Profile metadata| H
     A -->|API requests| C
     A -->|GPS| GEO
+    A -->|Reverse geocode| GEOCODE
     C --> D
     C -->|Weather| E
     C -->|Attractions/Restaurants| F
@@ -576,7 +579,7 @@ flowchart TD
 ### 11.5 Attraction Search Flow
 
 1. **User Action:** The user opens the Attraction Finder screen and enters a destination city or geographic coordinates.
-2. **Flutter Process:** Flutter sends a GET request to `/api/attractions?lat={lat}&lon={lon}&radius={radius}` with the Firebase ID token.
+2. **Flutter Process:** Flutter sends a GET request to `/api/attractions?location={location}&query={query}` with the Firebase ID token, where `location` is the destination name string (e.g. "Kuala Lumpur") and `query` is the search term (e.g. "tourist attractions").
 3. **Express API Process:** Express calls the SerpAPI Google Local engine using `axios` with the provided parameters and retrieves a list of nearby attractions.
 4. **SerpAPI Response:** SerpAPI returns a list of places with names, types, ratings, addresses, and thumbnails.
 5. **Express Processing:** Express processes the attraction data and returns a structured JSON list to the Flutter app.
@@ -650,6 +653,7 @@ flowchart TD
 | GET | `/api/hotels` | Hotel search via SerpAPI (`?query=&check_in=&check_out=`) | Yes | Attraction Finder |
 | GET | `/api/restaurants` | Restaurant search via SerpAPI (`?location=&query=`) | Yes | Attraction Finder |
 | GET | `/api/country-info` | Retrieve country information by name (`?name=`) | Yes | Country Information |
+| GET | `/api/geocode` | Reverse geocode coordinates to a place name (`?lat=&lon=`) | Yes | Weather Forecast, Home Dashboard |
 | **Location Search** | | | | |
 | GET | `/api/locations/countries` | List all countries | Yes | Trip Planner |
 | GET | `/api/locations/countries/:ciso/states` | List states of a country | Yes | Trip Planner |
@@ -988,24 +992,19 @@ smart_travel_planner/
 │   ├── database/
 │   │   ├── migrations/
 │   │   └── seeders/
-│   ├── tests/
 │   ├── .env.example
 │   ├── .nvmrc
 │   ├── package.json
-│   ├── package-lock.json
-│   └── README.md
+│   └── package-lock.json
 │
 ├── docs/
-│   ├── system_architecture.md
-│   ├── database_design.md
-│   ├── api-documentation.md
-│   └── report-draft.md
+│   ├── github-workflow.md
+│   └── system-architecture.md
 │
 ├── postman/
-│   └── smart_travel_planner_api.postman_collection.json
+│   └── test.txt
 │
-├── README.md
-└── .gitignore
+└── README.md
 ```
 
 ### 16.2 Why One Repository Is Used
@@ -1027,77 +1026,100 @@ The `docs/` folder stores all project documentation files. The `postman/` folder
 ```
 mobile_flutter/lib/
 ├── main.dart
-├── config/
-│   ├── app_config.dart
-│   └── firebase_options.dart
+├── firebase_options.dart
+├── app_config.dart
+├── app/
+│   └── app.dart
+├── constants/
+│   └── app_colors.dart
 ├── models/
-│   ├── user_model.dart
-│   ├── trip_model.dart
-│   ├── itinerary_model.dart
-│   ├── itinerary_item_model.dart
-│   ├── expense_model.dart
-│   └── destination_model.dart
+│   └── app_models.dart
 ├── providers/
 │   ├── auth_provider.dart
-│   ├── trip_provider.dart
+│   ├── attraction_provider.dart
+│   ├── budget_provider.dart
+│   ├── country_provider.dart
+│   ├── hotel_provider.dart
 │   ├── itinerary_provider.dart
-│   ├── expense_provider.dart
+│   ├── profile_provider.dart
+│   ├── restaurant_provider.dart
+│   ├── trip_provider.dart
 │   └── weather_provider.dart
-├── routes/
-│   └── app_routes.dart
+├── repositories/
+│   └── trip_repository.dart
 ├── screens/
-│   ├── auth/
-│   │   ├── login_screen.dart
-│   │   └── register_screen.dart
-│   ├── home/
-│   │   └── home_screen.dart
-│   ├── trip/
-│   │   ├── trip_list_screen.dart
-│   │   ├── create_trip_screen.dart
-│   │   └── trip_detail_screen.dart
-│   ├── itinerary/
-│   │   └── itinerary_screen.dart
-│   ├── weather/
-│   │   └── weather_screen.dart
-│   ├── attraction/
-│   │   └── attraction_screen.dart
-│   ├── country/
-│   │   └── country_info_screen.dart
-│   ├── budget/
-│   │   └── budget_tracker_screen.dart
-│   └── profile/
-│       └── profile_screen.dart
+│   ├── about_screen.dart
+│   ├── attraction_detail_screen.dart
+│   ├── attractions_screen.dart
+│   ├── auth_screen.dart
+│   ├── budget_screen.dart
+│   ├── country_screen.dart
+│   ├── create_trip_screen.dart
+│   ├── destination_detail_screen.dart
+│   ├── edit_profile_screen.dart
+│   ├── forgot_password_screen.dart
+│   ├── home_screen.dart
+│   ├── hotel_detail_screen.dart
+│   ├── hotel_screen.dart
+│   ├── itinerary_screen.dart
+│   ├── main_shell.dart
+│   ├── notifications_screen.dart
+│   ├── profile_screen.dart
+│   ├── register_screen.dart
+│   ├── restaurant_detail_screen.dart
+│   ├── restaurant_screen.dart
+│   ├── search_screen.dart
+│   ├── settings_screen.dart
+│   ├── splash_screen.dart
+│   ├── trip_detail_screen.dart
+│   ├── trips_screen.dart
+│   ├── verification_screen.dart
+│   └── weather_screen.dart
 ├── services/
 │   ├── api_service.dart
-│   ├── auth_service.dart
-│   ├── firestore_service.dart
-│   ├── weather_service.dart
 │   ├── attraction_service.dart
-│   └── country_service.dart
+│   ├── auth_service.dart
+│   ├── country_service.dart
+│   ├── firestore_service.dart
+│   ├── hotel_service.dart
+│   ├── location_service.dart
+│   ├── restaurant_service.dart
+│   └── weather_service.dart
+├── theme/
+│   └── app_theme.dart
 ├── utils/
-│   ├── constants.dart
-│   ├── helpers.dart
-│   └── validators.dart
+│   ├── location_helper.dart
+│   └── weather_utils.dart
 └── widgets/
-    ├── custom_button.dart
-    ├── custom_text_field.dart
+    ├── forecast_day_card.dart
+    ├── location_picker_sheet.dart
+    ├── primary_button.dart
+    ├── profile_avatar.dart
+    ├── profile_stat_card.dart
+    ├── rating_stars.dart
+    ├── result_card.dart
+    ├── section_header.dart
     ├── trip_card.dart
-    ├── expense_card.dart
-    └── loading_indicator.dart
+    └── trip_form.dart
 ```
 
 ### 17.1 Folder Descriptions
 
-| Folder | Purpose |
+| Folder or File | Purpose |
 |---|---|
-| `config/` | Application-wide configuration including API base URL and Firebase options generated by FlutterFire CLI |
-| `models/` | Dart data model classes representing API response structures with `fromJson` and `toJson` methods |
-| `providers/` | State management classes using Provider or Riverpod for reactive UI updates across screens |
-| `routes/` | Centralised named route definitions and navigation configuration |
-| `screens/` | Individual screen widgets organised by feature module, each mapped to a named route |
-| `services/` | Service classes that encapsulate HTTP API calls, Firebase SDK interactions, and external API requests |
-| `utils/` | Utility functions, constant values such as API base URL, and input validation helpers |
-| `widgets/` | Reusable custom widget components such as buttons, cards, and form fields used across multiple screens |
+| `main.dart` | Application entry point; initialises Firebase and runs the app |
+| `firebase_options.dart` | Firebase project configuration generated by FlutterFire CLI |
+| `app_config.dart` | Application-wide constants including API base URL and default location settings |
+| `app/app.dart` | Root widget; sets up `MultiProvider` with all registered providers and `MaterialApp` routing |
+| `constants/` | App-wide constant values; `app_colors.dart` defines the colour palette |
+| `models/app_models.dart` | All Dart model classes (`TripModel`, `ItineraryModel`, `ExpenseModel`, etc.) with `fromJson` and `toJson` methods |
+| `providers/` | State management classes using `Provider` / `ChangeNotifier` for reactive UI updates; one provider per feature domain |
+| `repositories/trip_repository.dart` | HTTP client layer for all trip-related API calls (trips, itineraries, items, expenses); handles auth token injection |
+| `screens/` | Individual screen widgets; one file per screen; navigation is handled via `MaterialPageRoute` and named routes |
+| `services/` | Service classes that call the Express REST API or Firebase SDK; one file per external integration |
+| `theme/app_theme.dart` | Material 3 theme configuration for the app |
+| `utils/` | Utility helpers: `location_helper.dart` wraps the `geolocator` permission flow; `weather_utils.dart` maps WMO weather codes to labels and icons |
+| `widgets/` | Reusable custom widgets used across multiple screens |
 
 ---
 
@@ -1110,43 +1132,58 @@ backend_express/src/
 │   ├── db.js
 │   └── firebase.js
 ├── controllers/
-│   ├── profileController.js
-│   ├── tripController.js
-│   ├── itineraryController.js
-│   ├── itineraryItemController.js
-│   ├── expenseController.js
-│   ├── weatherController.js
+│   ├── adminController.js
 │   ├── attractionController.js
 │   ├── countryController.js
-│   └── adminController.js
+│   ├── expenseController.js
+│   ├── geocodeController.js
+│   ├── hotelController.js
+│   ├── itineraryController.js
+│   ├── itineraryItemController.js
+│   ├── locationController.js
+│   ├── profileController.js
+│   ├── restaurantController.js
+│   ├── tripController.js
+│   └── weatherController.js
 ├── middleware/
-│   ├── firebaseAuthMiddleware.js
 │   ├── adminMiddleware.js
 │   ├── errorMiddleware.js
+│   ├── firebaseAuthMiddleware.js
+│   ├── normalizeBodyMiddleware.js
 │   └── validateMiddleware.js
 ├── models/
-│   ├── userModel.js
-│   ├── tripModel.js
-│   ├── itineraryModel.js
-│   ├── itineraryItemModel.js
+│   ├── destinationModel.js
 │   ├── expenseModel.js
-│   └── destinationModel.js
+│   ├── itineraryItemModel.js
+│   ├── itineraryModel.js
+│   ├── tripModel.js
+│   └── userModel.js
 ├── routes/
-│   ├── profileRoutes.js
-│   ├── tripRoutes.js
-│   ├── itineraryRoutes.js
-│   ├── expenseRoutes.js
-│   ├── weatherRoutes.js
+│   ├── adminRoutes.js
 │   ├── attractionRoutes.js
 │   ├── countryRoutes.js
-│   └── adminRoutes.js
+│   ├── expenseRoutes.js
+│   ├── geocodeRoutes.js
+│   ├── hotelRoutes.js
+│   ├── itineraryItemRoutes.js
+│   ├── itineraryRoutes.js
+│   ├── locationRoutes.js
+│   ├── profileRoutes.js
+│   ├── restaurantRoutes.js
+│   ├── tripRoutes.js
+│   └── weatherRoutes.js
 ├── services/
-│   ├── weatherService.js
 │   ├── attractionService.js
-│   └── countryService.js
+│   ├── countryService.js
+│   ├── geocodeService.js
+│   ├── hotelService.js
+│   ├── locationService.js
+│   ├── restaurantService.js
+│   └── weatherService.js
 └── utils/
-    ├── responseHelper.js
-    └── constants.js
+    ├── constants.js
+    ├── requestHelper.js
+    └── responseHelper.js
 
 backend_express/database/
 ├── migrations/
@@ -1158,24 +1195,39 @@ backend_express/database/
 │   ├── 006_create_expenses_table.sql
 │   └── 007_create_admin_logs_table.sql
 └── seeders/
-    ├── users_seeder.sql
-    └── destinations_seeder.sql
+    ├── destinations_seeder.sql
+    └── users_seeder.sql
 ```
 
 ### 18.1 Folder Descriptions
 
 | Folder or File | Purpose |
 |---|---|
-| `app.js` | Entry point for the Express application; initialises middleware, routes, and the HTTP server |
-| `config/` | Database connection configuration (`db.js`) and Firebase Admin SDK initialisation (`firebase.js`) |
-| `controllers/` | Request and response handler functions for each API endpoint; calls services or models to retrieve data |
-| `middleware/` | Express middleware functions for Firebase token authentication, admin role checking, error handling, and input validation |
-| `models/` | Database query functions for each MySQL table using the `mysql2` package; abstracts raw SQL from controllers |
-| `routes/` | Express Router definitions mapping HTTP methods and endpoint paths to controller functions |
-| `services/` | Business logic and external API communication; `weatherService.js`, `attractionService.js`, and `countryService.js` call external APIs using `axios` |
-| `utils/` | Shared utility functions such as standardised JSON response helpers and constant values |
-| `database/migrations/` | SQL migration files containing `CREATE TABLE` statements for initialising the MySQL schema |
-| `database/seeders/` | SQL seeder files for inserting initial or test data into the database |
+| `app.js` | Entry point; initialises environment validation, middleware stack, all route mounts, and the HTTP server |
+| `config/db.js` | MySQL connection pool using `mysql2/promise`; `dateStrings` option ensures dates are returned as `YYYY-MM-DD` strings |
+| `config/firebase.js` | Firebase Admin SDK initialisation using service account credentials from `.env` |
+| `controllers/` | Request/response handlers for each route group; calls services or models and returns JSON via `responseHelper` |
+| `controllers/geocodeController.js` | Reverse geocodes a `lat`/`lon` pair to a human-readable place name for the home dashboard |
+| `controllers/hotelController.js` | Hotel search via SerpAPI Google Hotels engine |
+| `controllers/locationController.js` | Proxies CountryStateCity API for country, state, and city dropdown data |
+| `controllers/restaurantController.js` | Restaurant search via SerpAPI Google Local engine |
+| `middleware/normalizeBodyMiddleware.js` | Converts snake_case request body keys to camelCase so controllers work with either format |
+| `middleware/validateMiddleware.js` | Validates required fields in request body or query string; returns 422 on failure |
+| `models/` | Raw SQL query functions per table using `mysql2`; no ORM |
+| `routes/geocodeRoutes.js` | `GET /api/geocode` — reverse geocoding endpoint |
+| `routes/hotelRoutes.js` | `GET /api/hotels` — hotel search |
+| `routes/itineraryItemRoutes.js` | `PUT /api/itinerary-items/:id` and `DELETE /api/itinerary-items/:id` |
+| `routes/locationRoutes.js` | `GET /api/locations/countries`, `/countries/:ciso/states`, `/countries/:ciso/states/:siso/cities` |
+| `routes/restaurantRoutes.js` | `GET /api/restaurants` — restaurant search |
+| `services/geocodeService.js` | Calls Open-Meteo or a geocoding API to convert coordinates to a place name |
+| `services/hotelService.js` | Calls SerpAPI Google Hotels engine and returns hotel results |
+| `services/locationService.js` | Calls CountryStateCity API with the `CSC_API_KEY` header |
+| `services/restaurantService.js` | Calls SerpAPI Google Local engine for restaurant results |
+| `utils/requestHelper.js` | `pick(body, key, fallback)` — reads optional fields from a request body, only falling back when the key is genuinely absent (prevents accidental clearing of nullable columns being blocked) |
+| `utils/responseHelper.js` | Standardised JSON response functions: `success()`, `created()`, `error()` |
+| `utils/constants.js` | Shared app constants: `TRIP_STATUS`, `USER_ROLES`, `ITINERARY_ITEM_TYPES`, `EXPENSE_CATEGORIES` |
+| `database/migrations/` | SQL `CREATE TABLE` files run once to initialise the schema |
+| `database/seeders/` | SQL files for inserting initial test data |
 
 ---
 
@@ -1469,20 +1521,26 @@ If remote hosting is required, the Express API can be deployed to **Render.com**
 | Screen | Contents |
 |---|---|
 | **Splash Screen** | Application logo, loading animation, redirect to login or home based on authentication state |
-| **Login Screen** | Email and password input fields, login button, navigation link to the registration screen |
-| **Register Screen** | Name, email, and password input fields, register button, navigation link to the login screen |
-| **Home Dashboard** | GPS-based weather, time greeting, user photo, trip/expense stats, feature cards |
-| **Trip List Screen** | Four tabs: All / Current / Planned / Completed, no search filter button |
-| **Create Trip Screen** | Single form: title, cascading location picker, dates, budget, currency, notes |
-| **Trip Detail Screen** | Trip info, weather per trip date, itinerary list auto-generated per date |
-| **Itinerary Screen** | Per-date items list, add/edit/delete items with time/type/location |
-| **Weather Forecast Screen** | Destination or coordinate input, current weather summary, 7-day forecast with temperature and condition icons |
-| **Attraction Finder Screen** | Destination input, list of nearby attractions with name, category, and description |
-| **Country Information Screen** | Country name input, display of national flag, capital, currency, official language, timezone, and region |
-| **Budget Tracker Screen** | Per-trip expenses, category breakdown, progress bar |
-| **Profile Screen** | Photo, name, email, stats — no role/preferences |
-| **Edit Profile Screen** | Photo upload, email change, password change only |
-| **Admin Dashboard** *(Optional)* | User list table, trip list table, delete actions for admin role users |
+| **Login / Auth Screen** | Email and password input fields, login button, navigation link to the registration screen and forgot password screen |
+| **Register Screen** | Name, email, and password input fields, register button |
+| **Home Dashboard** | Time-based greeting with user first name; circular profile avatar (top right, taps to Profile); GPS-based location detected via `geolocator` and reverse geocoded; weather summary card with current temperature and condition; stat cards showing total trip count and total spent; quick-access feature grid (Explore Trips, Weather, Country Info, Attractions) |
+| **Trip List Screen** | Four tabs: All / Current / Planned / Completed; `TripCard` list per tab; FAB navigates to Create Trip |
+| **Create Trip Screen** | Single-page form: title, cascading country → state → city location picker, start/end date pickers, budget amount, currency dropdown, notes; submits to `POST /api/trips` |
+| **Trip Detail Screen** | Trip info card (title, destination, dates, budget, status badge, notes); edit and delete buttons; weather outlook section with per-date forecast cards (coordinates entered manually); itinerary section listing auto-generated daily rows |
+| **Itinerary Screen** | Date header (read-only) with editable title and notes; list of itinerary items per day with time, type badge, title, and location; FAB opens add-item bottom sheet; swipe or icon to edit/delete items |
+| **Weather Forecast Screen** | Latitude and longitude input with search; current temperature, weather condition label and icon; 7-day horizontal scrollable forecast with max/min temperature and condition icon per day |
+| **Attractions Screen** | Location text field and query text field; search button; scrollable list of attraction results with thumbnail, name, category, rating, and address; tapping a card navigates to Attraction Detail |
+| **Attraction Detail Screen** | Full-width thumbnail; name, type badge, rating stars and review count; address card; description text |
+| **Hotel Screen** | Location/query input with check-in and check-out date pickers; search button; list of hotel results with thumbnail, name, rating, and price per night; tapping navigates to Hotel Detail |
+| **Hotel Detail Screen** | Full-width thumbnail; name, rating, review count; price per night card; description; "Visit Website" button |
+| **Restaurant Screen** | Location text field and cuisine/query text field; search button; list of restaurant results with thumbnail, name, type, rating, address, and opening hours |
+| **Restaurant Detail Screen** | Full-width thumbnail; name, type badge, rating stars; address card; opening hours card |
+| **Country Information Screen** | Country name text input; search button; displays national flag, official name, capital, currency, languages, timezone, region, and population |
+| **Budget Tracker Screen** | Total budget, total spent, and remaining balance displayed prominently; progress bar; category breakdown row; scrollable expense list with category icon, title, date, and amount; FAB opens add-expense bottom sheet |
+| **Profile Screen** | Circular avatar with initials fallback; display name and email; trip count and total spent stats; "Edit Profile" button; "Logout" button |
+| **Edit Profile Screen** | Circular avatar with camera overlay (tapping opens gallery/camera picker, uploads to Firebase Storage); name field; email field; new password and confirm password fields; Save button |
+| **Destination Detail Screen** | Destination name heading; explore chips for Attractions, Hotels, Restaurants, and Country Info; top 5 attractions list; "Create trip" button |
+| **Admin Dashboard** *(Admin role only)* | User list table; trip list table; delete actions via `DELETE /api/admin/trips/:id` |
 
 ---
 
