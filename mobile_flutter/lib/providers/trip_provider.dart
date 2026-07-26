@@ -1,53 +1,138 @@
 import 'package:flutter/material.dart';
+
 import '../models/app_models.dart';
 import '../repositories/trip_repository.dart';
 
 class TripProvider extends ChangeNotifier {
   final TripRepository _repository;
 
-  TripProvider(this._repository);
+  TripProvider({TripRepository? repository})
+      : _repository = repository ?? TripRepository();
 
+  List<TripModel> _allTrips = [];
+  TripModel? _selectedTrip;
+  List<ItineraryModel> _itineraries = [];
   bool _isLoading = false;
-  List<Trip> _trips = [];
-  Trip? _selectedTrip;
+  String? _error;
 
+  List<TripModel> get allTrips => _allTrips;
+  List<TripModel> get plannedTrips => _byStatus('planned');
+  List<TripModel> get ongoingTrips => _byStatus('ongoing');
+  List<TripModel> get completedTrips => _byStatus('completed');
+  TripModel? get selectedTrip => _selectedTrip;
+  List<ItineraryModel> get itineraries => _itineraries;
   bool get isLoading => _isLoading;
-  List<Trip> get trips => _trips;
-  Trip? get selectedTrip => _selectedTrip;
+  String? get error => _error;
+
+  List<TripModel> _byStatus(String status) =>
+      _allTrips.where((trip) => trip.status == status).toList();
 
   Future<void> loadTrips() async {
     _isLoading = true;
+    _error = null;
     notifyListeners();
-    _trips = await _repository.getTrips();
-    _isLoading = false;
-    notifyListeners();
-  }
 
-  Future<void> selectTrip(String tripId) async {
-    _selectedTrip = await _repository.getTripById(tripId);
-    notifyListeners();
-  }
-
-  Future<void> addTrip(Trip trip) async {
-    final createdTrip = await _repository.addTrip(trip);
-    _trips = [..._trips, createdTrip];
-    _selectedTrip = createdTrip;
-    notifyListeners();
-  }
-
-  Future<void> updateTrip(Trip trip) async {
-    final updatedTrip = await _repository.updateTrip(trip);
-    _trips = _trips.map((item) => item.id == updatedTrip.id ? updatedTrip : item).toList();
-    _selectedTrip = updatedTrip;
-    notifyListeners();
-  }
-
-  Future<void> deleteTrip(String tripId) async {
-    await _repository.deleteTrip(tripId);
-    _trips = _trips.where((trip) => trip.id != tripId).toList();
-    if (_selectedTrip?.id == tripId) {
-      _selectedTrip = null;
+    try {
+      _allTrips = await _repository.getAllTrips();
+    } catch (e) {
+      _error = _message(e);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
+  }
+
+  Future<void> loadTripDetail(int id) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _selectedTrip = await _repository.getTripById(id);
+      _itineraries = await _repository.getItineraries(id);
+    } catch (e) {
+      _error = _message(e);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> createTrip(Map<String, dynamic> data) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final trip = await _repository.createTrip(data);
+      _allTrips = [trip, ..._allTrips];
+      _selectedTrip = trip;
+    } catch (e) {
+      _error = _message(e);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateTrip(int id, Map<String, dynamic> data) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final trip = await _repository.updateTrip(id, data);
+      _allTrips = _allTrips.map((item) => item.id == id ? trip : item).toList();
+      if (_selectedTrip?.id == id) {
+        _selectedTrip = trip;
+      }
+    } catch (e) {
+      _error = _message(e);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteTrip(int id) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await _repository.deleteTrip(id);
+      _allTrips = _allTrips.where((trip) => trip.id != id).toList();
+      if (_selectedTrip?.id == id) {
+        _selectedTrip = null;
+        _itineraries = [];
+      }
+    } catch (e) {
+      _error = _message(e);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadItineraries(int tripId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _itineraries = await _repository.getItineraries(tripId);
+    } catch (e) {
+      _error = _message(e);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void selectTrip(TripModel trip) {
+    _selectedTrip = trip;
     notifyListeners();
   }
+
+  String _message(Object e) => e.toString().replaceFirst('Exception: ', '');
 }

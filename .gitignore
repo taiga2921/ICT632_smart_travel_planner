@@ -20,10 +20,10 @@
 # =============================================================================
 
 # Android Firebase config
-mobile_flutter/android/app/google-services.json
+# mobile_flutter/android/app/google-services.json
 
 # iOS Firebase config
-mobile_flutter/ios/GoogleService-Info.plist
+# mobile_flutter/ios/GoogleService-Info.plist
 
 # Express backend Firebase service account private key
 serviceAccountKey.json

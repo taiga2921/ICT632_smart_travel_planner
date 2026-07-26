@@ -28,7 +28,9 @@ function validateEnv() {
     console.error(' Fix: Fill in the missing variables in your .env file.');
     console.error(' See .env.example for the list of required variables.');
     console.error(' Get Firebase credentials from:');
-    console.error(' Firebase Console → Project Settings → Service Accounts → Generate new private key');
+    console.error(
+      ' Firebase Console → Project Settings → Service Accounts → Generate new private key',
+    );
     console.error('==========================================');
     process.exit(1);
   }
@@ -41,11 +43,13 @@ validateEnv();
 const express = require('express');
 const cors = require('cors');
 const errorMiddleware = require('./middleware/errorMiddleware');
+const normalizeBodyMiddleware = require('./middleware/normalizeBodyMiddleware');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(normalizeBodyMiddleware);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Smart Travel Planner API is running' });
@@ -61,8 +65,12 @@ app.use('/api/itineraries', require('./routes/itineraryRoutes'));
 app.use('/api/itinerary-items', require('./routes/itineraryItemRoutes'));
 app.use('/api/expenses', require('./routes/expenseRoutes'));
 app.use('/api/weather', require('./routes/weatherRoutes'));
+app.use('/api/geocode', require('./routes/geocodeRoutes'));
 app.use('/api/attractions', require('./routes/attractionRoutes'));
+app.use('/api/hotels', require('./routes/hotelRoutes'));
+app.use('/api/restaurants', require('./routes/restaurantRoutes'));
 app.use('/api/country-info', require('./routes/countryRoutes'));
+app.use('/api/locations', require('./routes/locationRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 
 app.use(errorMiddleware);

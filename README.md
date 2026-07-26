@@ -17,7 +17,9 @@ Smart Travel Planner is a cross-platform mobile application built with Flutter t
 | User Authentication  | Firebase Authentication (Free Spark Plan) |
 | Cloud Data Storage   | Firebase Firestore (Free Spark Plan)      |
 | Weather Forecast     | Open-Meteo API (Free, no key required)    |
-| Tourist Attractions  | OpenTripMap API (Free tier)               |
+| Tourist Attractions  | SerpAPI Google Local (Free tier)          |
+| Hotels               | SerpAPI Google Hotels (Free tier)         |
+| Restaurants          | SerpAPI Google Local (Free tier)          |
 | Country Information  | RestCountries API (Free, no key required) |
 
 
@@ -307,9 +309,9 @@ FIREBASE_PROJECT_ID=
 FIREBASE_CLIENT_EMAIL=
 FIREBASE_PRIVATE_KEY=
 
-# OpenTripMap API
-# Get a free key from: https://opentripmap.io/register
-OPENTRIPMAP_API_KEY=
+# SerpAPI (Google Local + Google Hotels)
+# Get a free key from: https://serpapi.com
+SERPAPI_KEY=
 ```
 
 > **Do not commit your** `.env` **file.** It is listed in `.gitignore`. Never put real credentials in `README.md` or any committed file.
@@ -411,7 +413,7 @@ flutterfire configure
 | ------------- | ------------ | -------------------------------------------------------------------------------------------------- |
 | Open-Meteo    | No           | No setup required                                                                                  |
 | RestCountries | No           | No setup required                                                                                  |
-| OpenTripMap   | Yes (Free)   | Register at [https://opentripmap.io](https://opentripmap.io) and add key to `backend_express/.env` |
+| SerpAPI       | Yes (Free)   | Register at [https://serpapi.com](https://serpapi.com) and add key to `backend_express/.env`       |
 
 
 ---
@@ -545,7 +547,7 @@ mysql -u root -p
 | ------------ | ------------------------------------------------------------------------------------------------------------- |
 | **Member 1** | Flutter UI, home screen, trip list, create trip screen, itinerary screen, navigation, reusable widgets        |
 | **Member 2** | Express API setup, trip CRUD, itinerary API, expense/budget API, admin API, middleware, validation            |
-| **Member 3** | Firebase Authentication in Flutter, Firestore service, Open-Meteo API, OpenTripMap API, RestCountries API     |
+| **Member 3** | Firebase Authentication in Flutter, Firestore service, Open-Meteo API, SerpAPI, RestCountries API             |
 | **Member 4** | MySQL migrations, seeders, model query functions, Postman testing, environment setup, bug fixing, screenshots |
 
 

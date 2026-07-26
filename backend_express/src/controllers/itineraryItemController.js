@@ -1,5 +1,27 @@
 const itineraryItemModel = require('../models/itineraryItemModel');
+const { pick } = require('../utils/requestHelper');
 const { success, created, error } = require('../utils/responseHelper');
+
+const getItemsByItinerary = async (req, res, next) => {
+  try {
+    const itinerary = await itineraryItemModel.verifyItineraryOwnership(
+      req.params.itineraryId,
+      req.user.id
+    );
+
+    if (!itinerary) {
+      return error(res, 'Itinerary not found', 404);
+    }
+
+    const items = await itineraryItemModel.findAllByItineraryId(
+      req.params.itineraryId,
+      req.user.id
+    );
+    return success(res, items, 'Itinerary items retrieved successfully');
+  } catch (err) {
+    next(err);
+  }
+};
 
 const createItineraryItem = async (req, res, next) => {
   try {
@@ -39,15 +61,13 @@ const updateItineraryItem = async (req, res, next) => {
       return error(res, 'Itinerary item not found', 404);
     }
 
-    const { title, description, location, startTime, endTime, type } = req.body;
-
     await itineraryItemModel.update(req.params.id, req.user.id, {
-      title: title ?? existing.title,
-      description: description ?? existing.description,
-      location: location ?? existing.location,
-      startTime: startTime ?? existing.start_time,
-      endTime: endTime ?? existing.end_time,
-      type: type ?? existing.type,
+      title: req.body.title ?? existing.title,
+      description: pick(req.body, 'description', existing.description),
+      location: pick(req.body, 'location', existing.location),
+      startTime: pick(req.body, 'startTime', existing.start_time),
+      endTime: pick(req.body, 'endTime', existing.end_time),
+      type: req.body.type ?? existing.type,
     });
 
     const item = await itineraryItemModel.findById(req.params.id, req.user.id);
@@ -72,6 +92,7 @@ const deleteItineraryItem = async (req, res, next) => {
 };
 
 module.exports = {
+  getItemsByItinerary,
   createItineraryItem,
   updateItineraryItem,
   deleteItineraryItem,

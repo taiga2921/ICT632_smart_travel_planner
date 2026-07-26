@@ -18,6 +18,13 @@ class FirestoreService {
   }
 
   Future<void> updateUserProfile(UserProfile profile) async {
-    await _users.doc(profile.uid).update(profile.toFirestore());
+    await _users.doc(profile.uid).set(
+          profile.toFirestore(),
+          SetOptions(merge: true),
+        );
+  }
+
+  Future<void> updatePhotoUrl(String uid, String photoUrl) async {
+    await _users.doc(uid).set({'photoURL': photoUrl}, SetOptions(merge: true));
   }
 }

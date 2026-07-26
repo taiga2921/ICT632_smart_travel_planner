@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../mock/mock_data.dart';
+import '../constants/app_colors.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -9,20 +9,30 @@ class NotificationsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Notifications')),
       body: SafeArea(
-        child: ListView.builder(
-          padding: const EdgeInsets.all(20),
-          itemCount: MockData.notifications.length,
-          itemBuilder: (context, index) {
-            final notification = MockData.notifications[index];
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              child: ListTile(
-                title: Text(notification.title),
-                subtitle: Text(notification.message),
-                trailing: Text(notification.time),
-              ),
-            );
-          },
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.notifications_none, size: 56, color: AppColors.textSecondary),
+                const SizedBox(height: 12),
+                Text(
+                  'No notifications yet',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Trip reminders and travel alerts will appear here.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

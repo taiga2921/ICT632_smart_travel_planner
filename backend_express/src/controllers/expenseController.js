@@ -1,5 +1,6 @@
 const expenseModel = require('../models/expenseModel');
 const tripModel = require('../models/tripModel');
+const { pick } = require('../utils/requestHelper');
 const { success, created, error } = require('../utils/responseHelper');
 
 const getExpensesByTrip = async (req, res, next) => {
@@ -52,15 +53,13 @@ const updateExpense = async (req, res, next) => {
       return error(res, 'Expense not found', 404);
     }
 
-    const { title, amount, currency, category, expenseDate, notes } = req.body;
-
     await expenseModel.update(req.params.id, req.user.id, {
-      title: title ?? existing.title,
-      amount: amount ?? existing.amount,
-      currency: currency ?? existing.currency,
-      category: category ?? existing.category,
-      expenseDate: expenseDate ?? existing.expense_date,
-      notes: notes ?? existing.notes,
+      title: req.body.title ?? existing.title,
+      amount: req.body.amount ?? existing.amount,
+      currency: req.body.currency ?? existing.currency,
+      category: req.body.category ?? existing.category,
+      expenseDate: req.body.expenseDate ?? existing.expense_date,
+      notes: pick(req.body, 'notes', existing.notes),
     });
 
     const expense = await expenseModel.findById(req.params.id, req.user.id);

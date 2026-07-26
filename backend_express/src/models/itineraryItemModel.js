@@ -1,5 +1,17 @@
 const pool = require('../config/db');
 
+const findAllByItineraryId = async (itineraryId, userId) => {
+  const [rows] = await pool.query(
+    `SELECT ii.* FROM itinerary_items ii
+     JOIN itineraries i ON ii.itinerary_id = i.id
+     JOIN trips t ON i.trip_id = t.id
+     WHERE ii.itinerary_id = ? AND t.user_id = ?
+     ORDER BY ii.start_time IS NULL, ii.start_time ASC, ii.id ASC`,
+    [itineraryId, userId]
+  );
+  return rows;
+};
+
 const findById = async (id, userId) => {
   const [rows] = await pool.query(
     `SELECT ii.* FROM itinerary_items ii
@@ -56,4 +68,11 @@ const verifyItineraryOwnership = async (itineraryId, userId) => {
   return rows[0] || null;
 };
 
-module.exports = { findById, create, update, remove, verifyItineraryOwnership };
+module.exports = {
+  findAllByItineraryId,
+  findById,
+  create,
+  update,
+  remove,
+  verifyItineraryOwnership,
+};

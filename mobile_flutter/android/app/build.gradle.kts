@@ -45,3 +45,12 @@ android {
 flutter {
     source = "../.."
 }
+
+// Workaround for Flutter debug builds with spaces in the project path:
+// Gradle can reuse stale flutter_assets, so the installed APK shows old Dart
+// code until a hot restart. Forcing this task to always run keeps installs fresh.
+tasks.configureEach {
+    if (name.startsWith("compileFlutterBuild")) {
+        outputs.upToDateWhen { false }
+    }
+}

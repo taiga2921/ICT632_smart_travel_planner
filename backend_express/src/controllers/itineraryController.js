@@ -1,5 +1,6 @@
 const itineraryModel = require('../models/itineraryModel');
 const tripModel = require('../models/tripModel');
+const { pick } = require('../utils/requestHelper');
 const { success, created, error } = require('../utils/responseHelper');
 
 const getItinerariesByTrip = async (req, res, next) => {
@@ -49,12 +50,10 @@ const updateItinerary = async (req, res, next) => {
       return error(res, 'Itinerary not found', 404);
     }
 
-    const { date, title, notes } = req.body;
-
     await itineraryModel.update(req.params.id, req.user.id, {
-      date: date ?? existing.date,
-      title: title ?? existing.title,
-      notes: notes ?? existing.notes,
+      date: req.body.date ?? existing.date,
+      title: pick(req.body, 'title', existing.title),
+      notes: pick(req.body, 'notes', existing.notes),
     });
 
     const itinerary = await itineraryModel.findById(req.params.id, req.user.id);

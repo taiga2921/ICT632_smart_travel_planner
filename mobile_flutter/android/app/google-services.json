@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "567887601717",
+    "project_id": "smart-travel-planner-ea644",
+    "storage_bucket": "smart-travel-planner-ea644.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:567887601717:android:8cafcb5ad30bb47724517c",
+        "android_client_info": {
+          "package_name": "com.example.mobile_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBp3jAaP0m_4LgZdzH5WoxJJR8DrMehKC8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
