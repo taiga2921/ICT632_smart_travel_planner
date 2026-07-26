@@ -8,6 +8,9 @@ const pool = mysql.createPool({
   password: process.env.DB_PASSWORD,
   waitForConnections: true,
   connectionLimit: 10,
+  // Keep DATE/DATETIME as raw strings so the API emits `YYYY-MM-DD` instead of a
+  // timezone-shifted ISO timestamp.
+  dateStrings: ['DATE', 'DATETIME'],
 });
 
 module.exports = pool;

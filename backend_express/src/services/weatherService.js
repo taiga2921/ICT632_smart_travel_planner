@@ -11,21 +11,7 @@ const getWeatherForecast = async (lat, lon) => {
       forecast_days: 7,
     },
   });
-
-  const { current_weather: currentWeather, daily } = response.data;
-
-  const dailyForecast = daily.time.map((date, index) => ({
-    date,
-    temperatureMax: daily.temperature_2m_max[index],
-    temperatureMin: daily.temperature_2m_min[index],
-    precipitationSum: daily.precipitation_sum[index],
-    weatherCode: daily.weathercode[index],
-  }));
-
-  return {
-    currentWeather,
-    dailyForecast,
-  };
+  return response.data;
 };
 
 module.exports = { getWeatherForecast };

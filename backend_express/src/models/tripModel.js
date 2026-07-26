@@ -1,5 +1,10 @@
 const pool = require('../config/db');
 
+/**
+ * Returns every trip for the user. Status filtering deliberately lives in the
+ * controller because the status shown to clients is derived from the trip dates
+ * rather than the stored column.
+ */
 const findAllByUserId = async (userId) => {
   const [rows] = await pool.query(
     'SELECT * FROM trips WHERE user_id = ? ORDER BY created_at DESC',

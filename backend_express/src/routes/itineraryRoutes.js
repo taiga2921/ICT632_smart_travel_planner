@@ -8,6 +8,11 @@ const { validateRequired } = require('../middleware/validateMiddleware');
 router.put('/:id', firebaseAuthMiddleware, itineraryController.updateItinerary);
 router.delete('/:id', firebaseAuthMiddleware, itineraryController.deleteItinerary);
 
+router.get(
+  '/:itineraryId/items',
+  firebaseAuthMiddleware,
+  itineraryItemController.getItemsByItinerary
+);
 router.post(
   '/:itineraryId/items',
   firebaseAuthMiddleware,

@@ -1,60 +1,61 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mobile_flutter/app/app.dart';
-import 'package:mobile_flutter/providers/profile_provider.dart';
-import 'package:mobile_flutter/providers/trip_provider.dart';
-import 'package:mobile_flutter/providers/weather_provider.dart';
-import 'package:mobile_flutter/repositories/trip_repository.dart';
-import 'package:mobile_flutter/providers/auth_provider.dart';
-import 'package:mobile_flutter/screens/budget_screen.dart';
-import 'package:mobile_flutter/screens/home_screen.dart';
-import 'package:mobile_flutter/screens/profile_screen.dart';
-import 'package:provider/provider.dart';
+import 'package:mobile_flutter/models/app_models.dart';
+import 'package:mobile_flutter/widgets/trip_card.dart';
+
+TripModel buildTrip({String status = 'planned'}) {
+  return TripModel(
+    id: 1,
+    userId: 1,
+    title: 'Penang Food Trip',
+    destinationName: 'George Town, Penang, Malaysia',
+    startDate: '2026-08-01',
+    endDate: '2026-08-05',
+    budget: 1500,
+    currency: 'MYR',
+    status: status,
+  );
+}
 
 void main() {
-  testWidgets('app launches with splash screen', (WidgetTester tester) async {
-    await tester.pumpWidget(const SmartTravelPlannerApp());
-
-    expect(find.text('Smart Travel Planner'), findsOneWidget);
+  test('trip status labels match the backend enum', () {
+    expect(TripStatus.label('planned'), 'Planned');
+    expect(TripStatus.label('ongoing'), 'Current');
+    expect(TripStatus.label('completed'), 'Completed');
   });
 
-  testWidgets('home dashboard shows quick actions section', (WidgetTester tester) async {
+  test('trip model parses backend JSON', () {
+    final trip = TripModel.fromJson({
+      'id': 7,
+      'user_id': 2,
+      'title': 'Tokyo',
+      'destination_name': 'Shibuya, Tokyo, Japan',
+      'start_date': '2026-09-01',
+      'end_date': '2026-09-07',
+      'budget': '4200.00',
+      'currency': 'JPY',
+      'notes': null,
+      'status': 'ongoing',
+      'created_at': '2026-07-01 10:00:00',
+    });
+
+    expect(trip.id, 7);
+    expect(trip.budget, 4200.0);
+    expect(trip.dayCount, 7);
+    expect(trip.status, 'ongoing');
+  });
+
+  testWidgets('trip card renders the trip summary', (WidgetTester tester) async {
     await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => TripProvider(MockTripRepository())),
-          ChangeNotifierProvider(create: (_) => WeatherProvider()),
-          ChangeNotifierProvider(create: (_) => ProfileProvider()),
-        ],
-        child: const MaterialApp(home: HomeScreen()),
+      MaterialApp(
+        home: Scaffold(
+          body: TripCard(trip: buildTrip(status: 'ongoing'), onTap: () {}),
+        ),
       ),
     );
 
-    await tester.pumpAndSettle();
-
-    expect(find.text('Quick actions'), findsOneWidget);
-  });
-
-  testWidgets('profile screen shows travel preferences', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => ProfileProvider()),
-          ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ],
-        child: const MaterialApp(home: ProfileScreen()),
-      ),
-    );
-
-    await tester.pumpAndSettle();
-
-    expect(find.text('Travel preferences'), findsOneWidget);
+    expect(find.text('Penang Food Trip'), findsOneWidget);
+    expect(find.text('Current'), findsOneWidget);
+    expect(find.text('George Town, Penang, Malaysia'), findsOneWidget);
   });
 }

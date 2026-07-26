@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
+import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
+import '../providers/auth_provider.dart';
 import 'auth_screen.dart';
+import 'main_shell.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,26 +15,29 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  Timer? _navigationTimer;
-
   @override
   void initState() {
     super.initState();
-    _navigationTimer = Timer(const Duration(seconds: 2), () {
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          pageBuilder: (_, __, ___) => const AuthScreen(),
-          transitionsBuilder: (_, animation, __, child) => FadeScaleTransition(animation: animation, child: child),
-        ),
-      );
-    });
+    _navigateAfterDelay();
   }
 
-  @override
-  void dispose() {
-    _navigationTimer?.cancel();
-    super.dispose();
+  Future<void> _navigateAfterDelay() async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    if (!mounted) return;
+
+    final authProvider = context.read<AuthProvider>();
+    final destination = authProvider.isAuthenticated
+        ? const MainShell()
+        : const AuthScreen();
+
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => destination,
+        transitionsBuilder: (_, animation, __, child) =>
+            FadeScaleTransition(animation: animation, child: child),
+      ),
+    );
   }
 
   @override
